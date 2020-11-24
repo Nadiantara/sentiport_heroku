@@ -1,0 +1,1 @@
+this folder contains all generated contents from user
