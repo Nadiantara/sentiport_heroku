@@ -4,6 +4,7 @@ from threading import Thread
 from email.message import EmailMessage
 from sentiport import app, mail
 
+
 def create_email_message(from_address, to_address, subject,
                         plaintext, html=None):
     msg = EmailMessage()

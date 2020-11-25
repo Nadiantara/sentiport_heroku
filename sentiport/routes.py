@@ -11,7 +11,7 @@ from email.message import EmailMessage
 import smtplib
 from email.mime.base import MIMEBase
 from email import encoders
-
+from os import environ
 # importing unit 4's functions
 from sentiport.utils.utilities.crawling import *
 from sentiport.utils.utilities.helper import *
@@ -46,8 +46,9 @@ def success():
 
         """SEND THE REPORT THROUGH EMAIL"""
         # Account used to send report
-        email_address = '*****'
-        email_password = '******'
+        email_address = environ.get('ST_EMAIL')
+        print("my email: " + email_address)
+        email_password = environ.get('ST_PASSWORD')
 
         # targeted email
         to_address = (
