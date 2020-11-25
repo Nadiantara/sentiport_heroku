@@ -15,6 +15,16 @@ def create_email_message(from_address, to_address, subject,
         msg.add_alternative(html, subtype='html')
     return msg
 
+
+def get_user_mail(targetmail):
+    for i in range(len(targetmail)):
+        if targetmail[i] == '@':
+            uname_targetmail = (targetmail[0:i])
+            domain_targetmail = (targetmail[-(len(targetmail)-i-1):])
+            return uname_targetmail, domain_targetmail
+
+
+# Got this from pedagogy, later will be modified
 def send_async_email(app, msg):
     with app.app_context():
         mail.send(msg)

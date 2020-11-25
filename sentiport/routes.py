@@ -16,7 +16,7 @@ from email import encoders
 from sentiport.utils.utilities.crawling import *
 from sentiport.utils.utilities.helper import *
 from sentiport.pdf_generator import create_pdf
-from sentiport.mail import create_email_message
+from sentiport.mail import create_email_message, get_user_mail
 from sentiport import app
 from flask import render_template, url_for, flash, redirect, request, make_response, jsonify, abort
 
@@ -34,24 +34,17 @@ def success():
         COUNTRY = request.form['country_code']
         targetmail = request.form['user_email']
         context = {'form_1': PLAYSTORE_ID, 'form_2': COUNTRY, 'form_3': targetmail}
-        for i in range(len(targetmail)):
-            if targetmail[i] == '@':
-                uname_targetmail = (targetmail[0:i])
-                domain_targetmail = (targetmail[-(len(targetmail)-i-1):])
+        uname_targetmail, domain_targetmail = get_user_mail(targetmail)
 
         print("Start!")
 
         """PREPARING PLOTS AND VALUE"""
-
         start = time.time()
         # crawling
         DATAFRAME = get_crawl_google(PLAYSTORE_ID, COUNTRY)
         fileName = create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY)
 
-
-
         """SEND THE REPORT THROUGH EMAIL"""
-
         # Account used to send report
         email_address = '*****'
         email_password = '******'
@@ -59,9 +52,7 @@ def success():
         # targeted email
         to_address = (
             Address(username=uname_targetmail, domain=domain_targetmail),
-        )
-
-        
+        ) 
         # body message
         with open("sentiport/templates/mail.html", "r", encoding='utf-8') as f:
             HTML_MESSAGE = f.read()
