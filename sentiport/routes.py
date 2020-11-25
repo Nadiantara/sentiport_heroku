@@ -34,16 +34,6 @@ def success():
         COUNTRY = request.form['country_code']
         targetmail = request.form['user_email']
         context = {'form_1': PLAYSTORE_ID, 'form_2': COUNTRY, 'form_3': targetmail}
-        
-        # PLAYSTORE_ID = input('Enter Playstore ID: ')
-
-
-        # COUNTRY = input('Enter COUNTRY ID: ')
-
-        # # targeted email input
-        # targetmail = input('Enter recipient email: ')
-
-        # dividing the email into uname and domain (for email function)
         for i in range(len(targetmail)):
             if targetmail[i] == '@':
                 uname_targetmail = (targetmail[0:i])
@@ -83,7 +73,6 @@ def success():
             plaintext="Plain text version.",
             html=HTML_MESSAGE
         )
-
 
         # attaching the report into email
         filename = fileName
