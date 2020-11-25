@@ -24,3 +24,10 @@ class Config:
     STATIC_FOLDER = 'static'
     TEMPLATES_FOLDER = 'templates'
     COMPRESSOR_DEBUG = environ.get('COMPRESSOR_DEBUG')
+    
+    #Email
+    MAIL_SERVER = 'smtp.googlemail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = environ.get('MY_EMAIL')
+    MAIL_PASSWORD = environ.get('MY_PASSWORD')

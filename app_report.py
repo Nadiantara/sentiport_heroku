@@ -433,8 +433,8 @@ print(f"PDF Report done! \n processing time: {(end-start)/60} min")
 """SEND THE REPORT THROUGH EMAIL"""
 
 # Account used to send report
-email_address = 'foundry@supertype.ai'
-email_password = 'F0unD01.R.01y.01'
+email_address = '*****'
+email_password = '*****'
 
 # targeted email
 to_address = (
