@@ -6,3 +6,4 @@ app.config.from_object('config.Config')
 mail = Mail(app)
 
 from sentiport import routes
+

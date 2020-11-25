@@ -12,6 +12,7 @@ import smtplib
 from email.mime.base import MIMEBase
 from email import encoders
 
+
 # importing unit 4's functions
 from sentiport.utils.utilities.crawling import *
 from sentiport.utils.utilities.helper import *
@@ -22,12 +23,22 @@ from sentiport.utils.pdf_table_reportlab.bad_good_review import get_top5_bad_rev
 from sentiport import app
 from flask import render_template, url_for, flash, redirect, request, make_response, jsonify, abort
 
+## Initialize variables
+from dotenv import load_dotenv
+from os import environ, path
+
+BASE_DIR = path.abspath(path.dirname(__file__))
+load_dotenv(path.join(BASE_DIR, '.env'))
+
+# Account used to send report
+email_address = environ.get('MY_EMAIL')
+email_password = environ.get('MY_PASSWORD')
+
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
         return render_template('index.html')
 
-        
 
 @app.route("/report", methods=['GET', 'POST'])
 def success():
@@ -63,10 +74,6 @@ def success():
 
 
         """SEND THE REPORT THROUGH EMAIL"""
-
-        # Account used to send report
-        email_address = 'foundry@supertype.ai'
-        email_password = 'F0unD01.R.01y.01'
 
         # targeted email
         to_address = (
