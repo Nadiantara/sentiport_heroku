@@ -269,7 +269,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         pdf.drawString(268, 768-285, f": {hari_ini}")
 
         # set size and position of total rating plot
-        pdf.drawInlineImage(fig_overall_rating, 921, 768 -
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_overall_rating}", 921, 768 -
                             635, width=378, height=293)
 
         # set font, size, and position of current rating and total review
@@ -292,7 +292,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
             r'sentiport\utils\Template\asset_template\Review Analysis by Time.png', 0, 0, width=1366, height=768)
 
         # set size and position of total review by time plot
-        pdf.drawInlineImage(fig_totalreview_time, 99, 768 -
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_totalreview_time}", 99, 768 -
                             603, width=1273-99, height=603-125)
 
         # set font, size, and position of insight summary
@@ -315,7 +315,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
             r'sentiport\utils\Template\asset_template\Review Analysis by Version.png', 0, 0, width=1366, height=768)
 
         # set size and position of total review by version plot
-        pdf.drawInlineImage(fig_totalreview_version, 99, 768 -
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_totalreview_version}", 99, 768 -
                             603, width=1273-99, height=603-125)
 
         # set font, size, and position of insight summary
@@ -338,13 +338,13 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
             r'sentiport\utils\Template\asset_template\Sentiment Analysis.png', 0, 0, width=1366, height=768)
 
         # set the size and position of sentiment by version plot
-        pdf.drawInlineImage(fig_sentiment_version, 48, 768 -
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_sentiment_version}", 48, 768 -
                             381, width=910-48, height=381-114)
         # set the size and position of sentiment by time plot
-        pdf.drawInlineImage(fig_sentiment_time, 48, 768-677,
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_sentiment_time}", 48, 768-677,
                             width=910-48, height=677-410)
         # set the size and position of total review sentiment plot
-        pdf.drawInlineImage(fig_totalreview_sentiment, 932, 768 -
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_totalreview_sentiment}", 932, 768 -
                             488, width=1327-932, height=488-113)
 
         # set font, size and position of insight summary
@@ -371,7 +371,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
             r'sentiport\utils\Template\asset_template\Review Language Analysis.png', 0, 0, width=1366, height=768)
 
         # set size and position of review language plot
-        pdf.drawInlineImage(fig_lang, 239, 768-595,
+        pdf.drawInlineImage(f"sentiport/artifacts/{fig_lang}", 239, 768-595,
                             width=1131-239, height=595-134)
 
         # set font, size, and positon of insight summary
