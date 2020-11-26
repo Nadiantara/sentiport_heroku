@@ -253,8 +253,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         pdf.showPage()
 
         # put the introduction template
-        pdf.drawInlineImage(
-            r'sentiport/utils/Template/asset_template/introduction.png', 0, 0, width=1366, height=768)
+        pdf.drawInlineImage('sentiport/utils/Template/asset_template/introduction.png', 0, 0, width=1366, height=768)
 
         # set font, size, and position of app name, app id, country id, and current date
         pdf.setFont("Helvetica-Oblique", 20)
@@ -288,8 +287,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         pdf.showPage()
 
         # put review analysis by time template
-        pdf.drawInlineImage(
-            r'sentiport/utils/Template/asset_template/review_analysis_by_time.png', 0, 0, width=1366, height=768)
+        pdf.drawInlineImage('sentiport/utils/Template/asset_template/review_analysis_by_time.png', 0, 0, width=1366, height=768)
 
         # set size and position of total review by time plot
         pdf.drawInlineImage(f"sentiport/artifacts/{fig_totalreview_time}", 99, 768 -
@@ -311,8 +309,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         pdf.showPage()
 
         # put review analysis by time template
-        pdf.drawInlineImage(
-            r'sentiport/utils/Template/asset_template/review_analysis_by_version.png', 0, 0, width=1366, height=768)
+        pdf.drawInlineImage('sentiport/utils/Template/asset_template/review_analysis_by_version.png', 0, 0, width=1366, height=768)
 
         # set size and position of total review by version plot
         pdf.drawInlineImage(f"sentiport/artifacts/{fig_totalreview_version}", 99, 768 -
