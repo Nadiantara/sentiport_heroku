@@ -9,8 +9,8 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-path_title = r'sentiport/utils/Helvetica-font/Helvetica-Bold.ttf'
-path_label = r'sentiport/utils/Helvetica-font/Helvetica.ttf'
+path_title = r'sentiport/utils/Helvetica-Font/Helvetica-Bold.ttf'
+path_label = r'sentiport/utils/Helvetica-Font/Helvetica.ttf'
 fontprop = fm.FontProperties(fname=path_title, size= 15)
 fontprop_label = fm.FontProperties(fname=path_label, size= 12)
 

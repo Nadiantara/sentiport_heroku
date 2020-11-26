@@ -237,8 +237,8 @@ def plot_detect_language2(DATAFRAME):
   plt.rcParams[rcParams] = cycler(color=colors)
 
   #install font for plot
-  path = 'sentiport/utils/Helvetica-font/Helvetica-Bold.ttf'
-  path1 = 'sentiport/utils/Helvetica-font/Helvetica-Oblique.ttf'
+  path = 'sentiport/utils/Helvetica-Font/Helvetica-Bold.ttf'
+  path1 = 'sentiport/utils/Helvetica-Font/Helvetica-Oblique.ttf'
   Helvetica_Bold = fm.FontProperties(fname=path, size= 18)
   Helvetica = fm.FontProperties(fname=path1, size= 15)
 
