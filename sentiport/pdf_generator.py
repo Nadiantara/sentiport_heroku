@@ -18,6 +18,7 @@ from sentiport.utils.pdf_table_reportlab.bad_good_review import get_top5_bad_rev
 def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         # cutting dataframe into maximum 1 year of data
         one_yr_ago = datetime.now() - relativedelta(years=1)
+        DATAFRAME = DATAFRAME.copy()
         DATAFRAME.index = DATAFRAME['at']
         DATAFRAME = DATAFRAME[DATAFRAME.index.map(pd.to_datetime) > one_yr_ago]
         DATAFRAME.reset_index(drop=True, inplace=True)

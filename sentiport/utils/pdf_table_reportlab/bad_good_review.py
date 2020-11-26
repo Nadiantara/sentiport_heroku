@@ -14,6 +14,7 @@ from math import log
 translator = Translator()
 
 def get_word_count(DATAFRAME):
+  DATAFRAME = DATAFRAME.copy()
   dataframe = DATAFRAME[['review','rating']]
   word_count = []
   word_count_log2 = []
@@ -106,6 +107,7 @@ def get_sentiment_score(bad_review):
 #  return df_clean
 
 def top_bad_review(dataframe, bad_review):
+  dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
   dataframe = dataframe.rename(columns={'review':'original_review'})
   #dataframe = get_lowercase(dataframe)
@@ -119,6 +121,7 @@ def top_bad_review(dataframe, bad_review):
   return bad_review
 
 def get_top5_bad_review(DATAFRAME):  
+  DATAFRAME = DATAFRAME.copy()
   dataframe = get_word_count(DATAFRAME)
   df_clean = get_clean_review(dataframe)
   bad_review = df_clean[df_clean['rating']<2]
@@ -135,6 +138,7 @@ def get_good_review(dataframe):
   return good_review
 
 def top_good_review(dataframe, good_review):
+  dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
   dataframe = dataframe.rename(columns={'review':'original_review'})
   #dataframe = get_lowercase(dataframe)
@@ -148,6 +152,7 @@ def top_good_review(dataframe, good_review):
   return good_review
 
 def get_top5_good_review(DATAFRAME):
+  DATAFRAME = DATAFRAME.copy()
   dataframe = get_word_count(DATAFRAME)
   good_review = get_good_review(dataframe)
   df_clean = get_clean_review(good_review)
@@ -221,6 +226,7 @@ def add_enter(dataframe, row_number):
 
 
 def transform_bad_review(bad_review):
+  bad_review = bad_review.copy()
   bad_review['worse_score'] = round(bad_review['worse_score'], 2)
   bad_review = bad_review[['original_review', 'worse_score']]
   sentence_rank_1 = bad_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
@@ -232,6 +238,7 @@ def transform_bad_review(bad_review):
   return sentence_rank_1
 
 def transform_good_review(good_review):
+  good_review = good_review.copy()
   good_review['good_score'] = round(good_review['good_score'], 2)
   good_review = good_review[['original_review', 'good_score']]
   sentence_rank_1 = good_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
