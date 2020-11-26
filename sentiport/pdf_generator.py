@@ -253,7 +253,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY):
         pdf.showPage()
 
         # put the introduction template
-        pdf.drawInlineImage('sentiport/utils/Template/asset_template/introduction.png', 0, 0, width=1366, height=768)
+        pdf.drawInlineImage('sentiport/utils/Template/asset_template/Introduction.png', 0, 0, width=1366, height=768)
 
         # set font, size, and position of app name, app id, country id, and current date
         pdf.setFont("Helvetica-Oblique", 20)
