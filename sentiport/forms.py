@@ -7,9 +7,8 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from datetime import date
 from wtforms.fields.html5 import DateField
 from wtforms.fields.html5 import DateTimeField
-from google_play_scraper import app, reviews_all, Sort
-from google_play_scraper import reviews as google_reviews
-from flask_login import current_user
+
+
 
 
 class AppForm(FlaskForm):
@@ -18,11 +17,13 @@ class AppForm(FlaskForm):
         validators=[
             DataRequired(),
             Regexp(
-                '^(\w+\.){2,}\w+$',
+                '^((\w+\.){2,}\w+)$',
                 message="You seem to have entered invalid app id."
             )
         ]
     )
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Submit')
 
 
 def _guess_store(appid):
