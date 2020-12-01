@@ -82,11 +82,14 @@ def lang_checker(dataframe):
     min_words_other = 2  # min words filtered
 
     dataframe_grouped = dataframe.groupby(by=[language], dropna=False).count()
-    dataframe_grouped[percentage] = (dataframe_grouped.review / dataframe_grouped.review.sum()) * 100
-    top_lang = dataframe_grouped[dataframe_grouped[percentage] > min_percentage].reset_index()
+    dataframe_grouped[percentage] = (
+        dataframe_grouped.review / dataframe_grouped.review.sum()) * 100
+    top_lang = dataframe_grouped[dataframe_grouped[percentage]
+                                 > min_percentage].reset_index()
     top_lang = top_lang[language].tolist()
 
-    other_lang = dataframe[~dataframe[language].isin(top_lang)][language].tolist()
+    other_lang = dataframe[~dataframe[language].isin(
+        top_lang)][language].tolist()
     dataframe[language] = dataframe[language].replace(other_lang, replace_lang)
 
     row_x = []
@@ -172,7 +175,8 @@ def plot_total_language1(DATAFRAME, temp_dir):
     max = int(lang['review'].max())
     min = int(lang['review'].min())
     cvals = [min, (min + max) / 2, max]
-    colors = [(109 / 255, 0 / 255, 0 / 255), (220 / 255, 211 / 255, 196 / 255), (0 / 255, 0 / 255, 0 / 255)]
+    colors = [(109 / 255, 0 / 255, 0 / 255), (220 / 255, 211 /
+                                              255, 196 / 255), (0 / 255, 0 / 255, 0 / 255)]
 
     norm = plt.Normalize(min, max)
     tuples = list(zip(map(norm, cvals), colors))
@@ -207,7 +211,7 @@ def plot_total_language1(DATAFRAME, temp_dir):
     ylabel('')
     xlabel('')
 
-    ## I ADDED THIS FOR BORDERLINE
+    # I ADDED THIS FOR BORDERLINE
     autoAxis = sub1.axis()
     rec = Rectangle((autoAxis[0] - 15, autoAxis[2] + 0.4), (autoAxis[1] - autoAxis[0]) + 20,
                     (autoAxis[3] - autoAxis[2]) - 0.7, fill=False, lw=2)
@@ -250,7 +254,8 @@ def plot_detect_language2(DATAFRAME, temp_dir):
     angle = -40
 
     # Set color map using cmasher
-    colors = cmr.take_cmap_colors(cmap_type, cmap_n, cmap_range=cmap_range, return_fmt=color_format)
+    colors = cmr.take_cmap_colors(
+        cmap_type, cmap_n, cmap_range=cmap_range, return_fmt=color_format)
     plt.rcParams[rcParams] = cycler(color=colors)
 
     # install font for plot
@@ -260,8 +265,10 @@ def plot_detect_language2(DATAFRAME, temp_dir):
     Helvetica = fm.FontProperties(fname=path1, size=15)
 
     # Create the plot function to generate dougnut chart
-    obj, ax = plt.subplots(figsize=(9.03307, 4.7017), dpi=100, subplot_kw=dict(aspect=aspect))
-    wedges, texts = ax.pie(data, wedgeprops=dict(width=width), startangle=angle)
+    obj, ax = plt.subplots(figsize=(9.03307, 4.7017),
+                           dpi=100, subplot_kw=dict(aspect=aspect))
+    wedges, texts = ax.pie(data, wedgeprops=dict(
+        width=width), startangle=angle)
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
     kw = dict(arrowprops=dict(arrowstyle="-"),
               bbox=bbox_props, zorder=0, va="center")
@@ -277,7 +284,8 @@ def plot_detect_language2(DATAFRAME, temp_dir):
                     horizontalalignment=horizontalalignment, **kw, fontproperties=Helvetica)
 
     sumstr = 'From\n' + str(lang.review.sum()) + '\nReviews'
-    ax.text(0., 0., sumstr, horizontalalignment='center', verticalalignment='center', fontproperties=Helvetica_Bold)
+    ax.text(0., 0., sumstr, horizontalalignment='center',
+            verticalalignment='center', fontproperties=Helvetica_Bold)
 
     obj.savefig(f'sentiport/artifacts/{temp_dir}/fig_lang.png')
 

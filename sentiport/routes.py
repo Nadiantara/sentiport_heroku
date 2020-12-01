@@ -70,9 +70,9 @@ def pipeline(PLAYSTORE_ID, COUNTRY, targetmail):
 
     """SEND THE REPORT THROUGH EMAIL"""
     # Account used to send report
-    email_address = environ.get('ST_EMAIL') or 'tb.adam.co.id@gmail.com'
+    email_address = environ.get('ST_EMAIL')
     print("my email: " + email_address)
-    email_password = environ.get('ST_PASSWORD') or 'lspwiljpkbgvpzni'
+    email_password = environ.get('ST_PASSWORD')
 
     # targeted email
     to_address = (
