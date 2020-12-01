@@ -104,14 +104,14 @@ print(f"Good-Bad Review done! \n processing time: {(end-start)/60} min with {(le
 fileName = 'testes.pdf'
 pdf = canvas.Canvas(fileName, pagesize=(1366,768))
 
-pdf.drawInlineImage(r'sentiport\utils\Template\asset_template\Template_Negative Reviews.png',0,0, width=1366, height=768)
+pdf.drawInlineImage(r'sentiport/utils/Template/asset_template/template_negative_reviews.png',0,0, width=1366, height=768)
 
 w, h = table.wrap(0, 0)
 table.drawOn(pdf, 40, 768-620)
 
 pdf.showPage()
 
-pdf.drawInlineImage(r'sentiport\utils\Template\asset_template\Positive Review.png',0,0, width=1366, height=768)
+pdf.drawInlineImage(r'sentiport/utils/Template/asset_template/positive_review.png',0,0, width=1366, height=768)
 
 w, h = table1.wrap(0, 0)
 table1.drawOn(pdf, 40, 768-620)

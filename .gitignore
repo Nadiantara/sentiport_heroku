@@ -25,3 +25,5 @@ venv.bak/
 **.pdf
 **.png
 !sentiport/utils/Template/**
+
+.*
