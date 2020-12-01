@@ -38,7 +38,7 @@ def _guess_store(appid):
         return None
 
 
-#not being used
+# not being used
 def validate_appid(appid: str, country: str):
     store = _guess_store(appid)
     assert store in ["AppStore", "PlayStore"]
@@ -61,5 +61,3 @@ def validate_appid(appid: str, country: str):
 
     if store == None:
         return None
-
-

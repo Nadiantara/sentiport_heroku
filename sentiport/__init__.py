@@ -1,13 +1,10 @@
 from flask import Flask
 from flask_mail import Mail
-import threading
-
-thread_lock = threading.Lock()
-pipeline_thread = threading.Thread()
+from threading import Lock
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
 mail = Mail(app)
+thread_lock = Lock()
 
 from sentiport import routes
-
