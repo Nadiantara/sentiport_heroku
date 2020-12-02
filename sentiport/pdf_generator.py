@@ -4,15 +4,15 @@ from reportlab.platypus import TableStyle
 from reportlab.lib import colors
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+import pandas as pd
 import time
 from datetime import date
-from sentiport.utils.utilities.crawling import *
-from sentiport.utils.utilities.helper import *
+from sentiport.utils.utilities.crawling import get_crawl_google, app_title, value_overall_rating, value_total_review, image_company_logo
+# from sentiport.utils.utilities.helper import *
 from sentiport.utils.plot_detect_language.detect_language import plot_detect_language2
-from sentiport.utils.plot_rating.rating import *
-from sentiport.utils.plot_sentiment_analysis.sentiment_analysis import *
-from sentiport.utils.pdf_table_reportlab.bad_good_review import get_top5_bad_review, get_top5_good_review, \
-    transform_bad_review, transform_good_review
+from sentiport.utils.plot_rating.rating import plot_overall_rating
+from sentiport.utils.plot_sentiment_analysis.sentiment_analysis import sentiment_visual_preprocessing, plot_sentiment_time, plot_sentiment_version, plot_totalreview_sentiment, plot_totalreview_time, plot_totalreview_version
+from sentiport.utils.pdf_table_reportlab.bad_good_review import good_bad_table
 
 
 def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
@@ -31,27 +31,32 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     start = time.time()
     # scrapping current rating
+    company_logo = image_company_logo(PLAYSTORE_ID, temp_dir)
     current_rating = value_overall_rating(PLAYSTORE_ID)
     end = time.time()
-    print(f"Rating scrapping done! \n processing time: {(end - start) / 60} min")
+    print(
+        f"Rating scrapping done! \n processing time: {(end - start) / 60} min")
 
     start = time.time()
     # scrapping current total review
     current_review = value_total_review(PLAYSTORE_ID)
     end = time.time()
-    print(f"Total Review scrapping done! \n processing time: {(end - start) / 60} min")
+    print(
+        f"Total Review scrapping done! \n processing time: {(end - start) / 60} min")
 
     start = time.time()
     # call detect language plot and most language value
     fig_lang, most_lang = plot_detect_language2(DATAFRAME, temp_dir)
     end = time.time()
-    print(f"Review Language done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
+    print(
+        f"Review Language done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
 
     start = time.time()
     # call overall rating plot
     fig_overall_rating = plot_overall_rating(DATAFRAME, temp_dir)
     end = time.time()
-    print(f"Overall Rating done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
+    print(
+        f"Overall Rating done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
 
     start = time.time()
     # call total review by time plot and all the value
@@ -94,75 +99,10 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     start = time.time()
     # prepare good review and bad review table for plot
-    bad_review = get_top5_bad_review(DATAFRAME)
-    bad_review = transform_bad_review(bad_review)
-    good_review = get_top5_good_review(DATAFRAME)
-    good_review = transform_good_review(good_review)
-    bad_tab = bad_review.reset_index(
-        drop=True).T.reset_index().T.values.tolist()
-    pos_tab = good_review.reset_index(
-        drop=True).T.reset_index().T.values.tolist()
-    table = Table(bad_tab, [1180, 100])
-    table1 = Table(pos_tab, [1180, 100])
-
-    # Set font style
-    font = TableStyle([
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('FONTSIZE', (0, 0), (1, 1), 15),
-        ('FONTSIZE', (0, 1), (1, 1), 23),
-        ('FONTSIZE', (0, 2), (1, 2), 21),
-        ('FONTSIZE', (0, 3), (1, 3), 19),
-        ('FONTSIZE', (0, 4), (1, 4), 17),
-        ('FONTSIZE', (0, 5), (1, 5), 15),
-        # ('FONTSIZE', (0,1), (-1,-1), 15),
-    ])
-    table.setStyle(font)
-    table1.setStyle(font)
-    # Set Table padding
-    padding = TableStyle([
-        ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
-        ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('ALIGN', (0, 1), (-1, 0), 'LEFT'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 15),
-        ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
-        ('TOPPADDING', (0, 0), (-1, 0), 12),
-        ('TOPPADDING', (0, 1), (-1, -1), 8),
-        ('LEADING', (0, 1), (1, 1), 25),
-        ('LEADING', (0, 2), (1, 2), 23),
-        ('LEADING', (0, 3), (1, 3), 21),
-        ('LEADING', (0, 4), (1, 4), 19),
-        ('LEADING', (0, 5), (1, 5), 17),
-
-        ('BACKGROUND', (0, 1), (-1, -1), colors.burlywood),
-    ])
-    table.setStyle(padding)
-    table1.setStyle(padding)
-
-    # 3) Alternate backgroud color
-    color = TableStyle([
-        ('BACKGROUND', (0, 0), (3, 0), colors.HexColor('#6d0000')),
-        ('BACKGROUND', (0, 1), (2, 1), colors.HexColor('#e66c6c')),
-        ('BACKGROUND', (0, 2), (2, 2), colors.HexColor('#f78686')),
-        ('BACKGROUND', (0, 3), (2, 3), colors.HexColor('#f7a1a1')),
-        ('BACKGROUND', (0, 4), (2, 4), colors.HexColor('#ffbfbf')),
-        ('BACKGROUND', (0, 5), (2, 5), colors.HexColor('#ffd6d6')),
-    ]
-    )
-    color1 = TableStyle([
-        ('BACKGROUND', (0, 0), (3, 0), colors.green),
-        ('BACKGROUND', (0, 1), (2, 1), colors.HexColor('#57d964')),
-        ('BACKGROUND', (0, 2), (2, 2), colors.HexColor('#71e37d')),
-        ('BACKGROUND', (0, 3), (2, 3), colors.HexColor('#91ed9a')),
-        ('BACKGROUND', (0, 4), (2, 4), colors.HexColor('#b8fcbf')),
-        ('BACKGROUND', (0, 5), (2, 5), colors.HexColor('#d6ffda')),
-    ]
-    )
-    table.setStyle(color)
-    table1.setStyle(color1)
+    negative_table, positive_table = good_bad_table(DATAFRAME)
     end = time.time()
-    print(f"Good-Bad Review done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
+    print(
+        f"Good-Bad Review done! \n processing time: {(end - start) / 60} min with {(len(DATAFRAME))} reviews")
 
     # get the full app title (ex: Halodoc - Doctors, Medicine, & Appiontments)
     app_title_name = app_title(PLAYSTORE_ID, COUNTRY)
@@ -215,6 +155,9 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.setFont("Helvetica", 18)
     pdf.drawString(1155, 768 - 63, hari_ini)
 
+    # put logo in front page
+    pdf.drawInlineImage(company_logo, 75, 768-350, width=230, height=230)
+
     # set font, size, and position of app name and report title
     pdf.setFont("Helvetica-Bold", 50)
     pdf.drawString(75, 768 - 345, app_name)
@@ -234,6 +177,9 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/table_of_content.png', 0, 0, width=1366, height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
+
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
     pdf.drawString(20, 768 - 740, app_title_name)
@@ -248,6 +194,9 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/executive_summary.png', 0, 0, width=1366, height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
+
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
     pdf.drawString(20, 768 - 740, app_title_name)
@@ -259,7 +208,11 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.showPage()
 
     # put the introduction template
-    pdf.drawInlineImage('sentiport/utils/Template/asset_template/Introduction.png', 0, 0, width=1366, height=768)
+    pdf.drawInlineImage(
+        'sentiport/utils/Template/asset_template/Introduction.png', 0, 0, width=1366, height=768)
+
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
 
     # set font, size, and position of app name, app id, country id, and current date
     pdf.setFont("Helvetica-Oblique", 20)
@@ -276,7 +229,6 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     # set size and position of total rating plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_overall_rating}"
     pdf.drawInlineImage(img, 921, 768 - 635, width=378, height=293)
-    
 
     # set font, size, and position of current rating and total review
     pdf.setFont("Helvetica-Bold", 54)
@@ -296,12 +248,14 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     # put review analysis by time template
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/review_analysis_by_time.png', 0, 0, width=1366,
-                        height=768)
+        height=768)
+
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
 
     # set size and position of total review by time plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_totalreview_time}"
     pdf.drawInlineImage(img, 99, 768 - 603, width=1273 - 99, height=603 - 125)
-    
 
     # set font, size, and position of insight summary
     pdf.setFont("Helvetica-BoldOblique", 36)
@@ -322,10 +276,12 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(f'sentiport/utils/Template/asset_template/review_analysis_by_version.png', 0, 0, width=1366,
                         height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
+
     # set size and position of total review by version plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_totalreview_version}"
     pdf.drawInlineImage(img, 99, 768 - 603, width=1273 - 99, height=603 - 125)
-    
 
     # set font, size, and position of insight summary
     pdf.setFont("Helvetica-BoldOblique", 36)
@@ -346,20 +302,21 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/sentiment_analysis.png', 0, 0, width=1366, height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
+
     # set the size and position of sentiment by version plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_sentiment_version}"
     pdf.drawInlineImage(img, 48, 768 - 381, width=910 - 48, height=381 - 114)
-    
-    
+
     # set the size and position of sentiment by time plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_sentiment_time}"
     pdf.drawInlineImage(img, 48, 768 - 677, width=910 - 48, height=677 - 410)
-    
 
     # set the size and position of total review sentiment plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_totalreview_sentiment}"
-    pdf.drawInlineImage(img, 932, 768 - 488, width=1327 - 932, height=488 - 113)
-    
+    pdf.drawInlineImage(img, 932, 768 - 488, width=1327 -
+                        932, height=488 - 113)
 
     # set font, size and position of insight summary
     pdf.setFont("Helvetica-BoldOblique", 16)
@@ -384,10 +341,13 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/review_language_analysis.png', 0, 0, width=1366, height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
+
     # set size and position of review language plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_lang}"
-    pdf.drawInlineImage(img, 239, 768 - 595, width=1131 - 239, height=595 - 134)
-    
+    pdf.drawInlineImage(img, 239, 768 - 595, width=1131 -
+                        239, height=595 - 134)
 
     # set font, size, and positon of insight summary
     pdf.setFont("Helvetica-BoldOblique", 36)
@@ -408,15 +368,17 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawInlineImage(
         f'sentiport/utils/Template/asset_template/template_negative_reviews.png', 0, 0, width=1366, height=768)
 
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
     # set the position of bad review table
-    w, h = table.wrap(0, 0)
-    table.drawOn(pdf, 40, 768 - 680)
+    w, h = negative_table.wrap(0, 0)
+    negative_table.drawOn(pdf, 40, 768-690)
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
-    pdf.drawString(20, 768 - 740, app_title_name)
+    pdf.drawString(20, 768-740, app_title_name)
     pdf.setFont("Helvetica-Oblique", 20)
-    pdf.drawString(683, 768 - 740, "| Top 5 Negative Review")
+    pdf.drawString(683, 768-740, "| Top 5 Negative Review")
 
     """ GOOD REVIEW """
     # page break
@@ -424,17 +386,20 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put good review template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/positive_review.png', 0, 0, width=1366, height=768)
+        f"sentiport/utils/Template/asset_template/positive_review.png", 0, 0, width=1366, height=768)
+
+    # put logo
+    pdf.drawInlineImage(company_logo, 1135, 768-80, width=55, height=55)
 
     # set position of good review table
-    w, h = table1.wrap(0, 0)
-    table1.drawOn(pdf, 40, 768 - 680)
+    w, h = positive_table.wrap(0, 0)
+    positive_table.drawOn(pdf, 40, 768-690)
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
-    pdf.drawString(20, 768 - 740, app_title_name)
+    pdf.drawString(20, 768-740, app_title_name)
     pdf.setFont("Helvetica-Oblique", 20)
-    pdf.drawString(683, 768 - 740, "| Top 5 Positive Review")
+    pdf.drawString(683, 768-740, "| Top 5 Positive Review")
 
     """ CLOSING PAGE """
     # page break
