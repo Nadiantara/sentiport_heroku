@@ -409,8 +409,11 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
         f'sentiport/utils/Template/asset_template/template_negative_reviews.png', 0, 0, width=1366, height=768)
 
     # set the position of bad review table
-    w, h = table.wrap(0, 0)
-    table.drawOn(pdf, 40, 768 - 680)
+    try:
+        w, h = table.wrap(0, 0)
+        table.drawOn(pdf, 40, 768 - 680)
+    except IndexError:
+        pass
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)

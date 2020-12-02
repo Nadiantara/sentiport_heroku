@@ -3,8 +3,10 @@ from reportlab.platypus import Table
 from reportlab.platypus import TableStyle
 from reportlab.lib import colors
 from datetime import datetime
+import re
 from dateutil.relativedelta import relativedelta
 import time
+import requests
 from datetime import date
 from email.headerregistry import Address
 from email.message import EmailMessage
@@ -19,6 +21,7 @@ from sentiport.utils.utilities.crawling import *
 from sentiport.utils.utilities.helper import *
 from sentiport.pdf_generator import create_pdf
 from sentiport.mail import create_email_message, get_user_mail
+from sentiport.forms import AppForm
 from sentiport import app, thread_lock
 from flask import render_template, url_for, flash, redirect, request, make_response, jsonify, abort, session
 from uuid import uuid1
@@ -26,30 +29,46 @@ from uuid import uuid1
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    form = AppForm()
+    return render_template('index.html', form=form)
 
 
 @app.route("/scrape", methods=['GET', 'POST'])
 def scrape():
-    if request.method == 'POST':
+    form = AppForm()
+    if form.validate_on_submit():
         # get some data
-        PLAYSTORE_ID = request.form['playstore_id']
+        APP_URL = form.app_id.data
         COUNTRY = request.form['country_code']
-        targetmail = request.form['user_email']
-
+        targetmail = form.email.data
+        url_res = requests.get(APP_URL)
+        PLAYSTORE_ID = get_id(APP_URL)
+        print("PLAYSTORE ID: " + PLAYSTORE_ID)
         # start thread
-        Thread(
-            target=pipeline,
-            args=(
-                PLAYSTORE_ID,
-                COUNTRY,
-                targetmail
-            )
-        ).start()
+        if url_res.status_code == 200:
+            Thread(
+                target=pipeline,
+                args=(
+                    PLAYSTORE_ID,
+                    COUNTRY,
+                    targetmail
+                )
+            ).start()
 
-        # return something
+            flash("""An message with pdf attachment will be sent to your email in 5 to 10 minutes,
+                please contact us if you recieve none""", 'success')
+            return redirect(url_for('index'))
+        flash("""Wrong app url or the app doesnt exist""", 'danger')
+        return redirect(url_for('index'))
+    else:
+        flash("""Wrong app url or the app doesnt exist""", 'danger')
         return redirect(url_for('index'))
 
+
+def get_id(toParse):
+    regex = r'\?id=([a-zA-Z\.]+)'
+    app_id = re.findall(regex, toParse)[0]
+    return app_id
 
 def pipeline(PLAYSTORE_ID, COUNTRY, targetmail):
     print("Start!")
