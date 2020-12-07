@@ -16,7 +16,7 @@
                 {{ form.hidden_tag() }}
                 <div class="form-group w-50">
                     <!-- form.app_id.label -->
-                    <a class="my-0 py-0">App URL</a>
+                    <a class="my-0 py-0">Playstore URL</a>
                     {{ form.app_id(class="form-control") }}
                     {% for error in form.app_id.errors %}
                     <span class="text-danger">{{ error }}</span>
@@ -31,7 +31,7 @@
                         {% endfor %}
                     </div>
                 <div class="form-group w-50">
-                    <a class="my-0 py-0">Country Code</a>
+                    <a class="my-0 py-0">Country</a>
                     <select name="country_code" id="country_code" required="required" style="width:200px">
                         <option value="" label="Select a country ... " selected="selected">Select a country ... </option>
                         <optgroup id="country-optgroup-Africa" label="Africa">

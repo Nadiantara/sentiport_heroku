@@ -82,11 +82,17 @@ def get_sentiment_dataframe(TRANSLATED_DATAFRAME):
 
     for i in range(len(TRANSLATED_DATAFRAME)):
         if TRANSLATED_DATAFRAME.polarity[i] > 0:
-            TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Positive'
+            #TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Positive'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Positive'
         elif TRANSLATED_DATAFRAME.polarity[i] == 0:
-            TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Neutral'
+            #TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Neutral'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Neutral'
         elif TRANSLATED_DATAFRAME.polarity[i] < 0:
-            TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Negative'
+            #TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Negative'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Negative'
 
     TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
     TRANSLATED_DATAFRAME['time'] = TRANSLATED_DATAFRAME['time'].dt.strftime('%Y-%m-%d')
