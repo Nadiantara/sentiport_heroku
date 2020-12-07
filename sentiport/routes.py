@@ -27,6 +27,11 @@ from flask import render_template, url_for, flash, redirect, request, make_respo
 from uuid import uuid1
 
 
+#Error handler
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
 @app.route("/", methods=['GET', 'POST'])
 def index():
     form = AppForm()
@@ -41,9 +46,12 @@ def scrape():
         APP_URL = form.app_id.data
         COUNTRY = request.form['country_code']
         targetmail = form.email.data
-        url_res = requests.get(APP_URL)
-        PLAYSTORE_ID = get_id(APP_URL)
-        print("PLAYSTORE ID: " + PLAYSTORE_ID)
+        try:
+            url_res = requests.get(APP_URL)
+            PLAYSTORE_ID = get_id(APP_URL)
+        except:
+            abort(404)
+       
         # start thread
         if url_res.status_code == 200:
             Thread(
