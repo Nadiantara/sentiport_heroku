@@ -1,4 +1,4 @@
-#Libraries
+# Libraries
 import altair as alt
 import pandas as pd
 import re
@@ -18,10 +18,11 @@ Original file is located at
     https://colab.research.google.com/drive/1OduaKQslyxiCeuI5shKfxlPfNl7IZqPx
 """
 path = r'sentiport/utils/Helvetica-Font/Helvetica-Bold.ttf'
-fontprop = fm.FontProperties(fname=path, size= 15)
+fontprop = fm.FontProperties(fname=path, size=15)
+
 
 # @title User Rating Plot Function as "plot_matplotlib_totalrating_3(dataframe)"
-def plot_overall_rating(dataframe):
+def plot_overall_rating(dataframe, temp_dir):
     '''
     This function is used to plot total review by version
 
@@ -31,25 +32,25 @@ def plot_overall_rating(dataframe):
     returns:
     plot
     '''
-    #Overal Rating Chart
-    #Preprocessing
+    # Overal Rating Chart
+    # Preprocessing
     df = dataframe
     grouped_multiple = df.groupby(['rating']).agg({'review': ['count']})
     grouped_multiple.columns = ['review']
     grouped_multiple = grouped_multiple.reset_index()
     grouped_multiple.sort_values(by=['rating', 'review'], inplace=False, ascending=False)
     grouped_multiple['value'] = (grouped_multiple['review'] / grouped_multiple['review'].sum()) * 100
-    grouped_multiple['value'] = grouped_multiple['value'].astype(int) 
-    
-    #Plot
+    grouped_multiple['value'] = grouped_multiple['value'].astype(int)
+
+    # Plot
     value = grouped_multiple['value']
     bars = grouped_multiple['rating']
     cmap = mcolors.LinearSegmentedColormap.from_list("", ["#e0432f", "#44bb55"])
-    
-    #Create horizontal bars
-    plt.figure(figsize=(3.8377,2.9858), dpi=100)
-    plt.barh(bars, value, color=cmap(grouped_multiple.rating.values/grouped_multiple.rating.values.max()))
-    
+
+    # Create horizontal bars
+    plt.figure(figsize=(3.8377, 2.9858), dpi=100)
+    plt.barh(bars, value, color=cmap(grouped_multiple.rating.values / grouped_multiple.rating.values.max()))
+
     # Create names on the y-axis
     plt.yticks(bars)
     plt.title("Total Rating", fontproperties=fontprop)
@@ -57,7 +58,7 @@ def plot_overall_rating(dataframe):
     plt.xlim(xmin=0)
     plt.ylim(ymin=0)
     plt.grid(False)
-    
-    plt.savefig("sentiport/artifacts/fig_overall_rating.png",
+
+    plt.savefig(f"sentiport/artifacts/{temp_dir}/fig_overall_rating.png",
                 bbox_inches='tight')
-    return "fig_overall_rating.png"
+    return f"fig_overall_rating.png"

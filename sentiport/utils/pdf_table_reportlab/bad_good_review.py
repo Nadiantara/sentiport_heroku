@@ -14,16 +14,17 @@ from math import log
 translator = Translator()
 
 def get_word_count(DATAFRAME):
-  DATAFRAME = DATAFRAME.copy()
-  dataframe = DATAFRAME[['review','rating']]
+  dataframe = DATAFRAME.copy()[['review', 'rating']]
   word_count = []
   word_count_log2 = []
   for i in range(len(dataframe)):
     word_count.append(len(dataframe['review'][i].split()))
-  dataframe['word_count'] = pd.DataFrame(word_count)
+  #dataframe['word_count'] = pd.DataFrame(word_count)
+  dataframe.loc[:, 'word_count'] = word_count
   for i in range(len(dataframe)):
     word_count_log2.append(log(dataframe['word_count'][i],2))
-  dataframe['word_count_score'] = pd.DataFrame(word_count_log2)
+  #dataframe['word_count_score'] = pd.DataFrame(word_count_log2)
+  dataframe.loc[:, 'word_count_score'] = word_count_log2
   return dataframe
 
 def clean_text_round1(text):
@@ -219,8 +220,8 @@ def add_enter(dataframe, row_number):
       enter_needed = max_enter - num_enter
       for i in range(enter_needed):
         new_text += "\n"
-    
-    dataframe['original_review'].iloc[row_number] = new_text
+    # dataframe['original_review'].iloc[row_number] = new_text
+    dataframe.iloc[row_number, dataframe.columns.get_loc('original_review')] = new_text
     return dataframe
 
 

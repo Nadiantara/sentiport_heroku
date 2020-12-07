@@ -6,7 +6,7 @@ from sentiport import app, mail
 
 
 def create_email_message(from_address, to_address, subject,
-                        plaintext, html=None):
+                         plaintext, html=None):
     msg = EmailMessage()
     msg['From'] = from_address
     msg['To'] = to_address
@@ -21,7 +21,7 @@ def get_user_mail(targetmail):
     for i in range(len(targetmail)):
         if targetmail[i] == '@':
             uname_targetmail = (targetmail[0:i])
-            domain_targetmail = (targetmail[-(len(targetmail)-i-1):])
+            domain_targetmail = (targetmail[-(len(targetmail) - i - 1):])
             return uname_targetmail, domain_targetmail
 
 
@@ -47,4 +47,3 @@ def send_pw_reset_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token))
-
