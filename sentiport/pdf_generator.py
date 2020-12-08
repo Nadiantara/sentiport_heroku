@@ -209,7 +209,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     """ COVER DEPAN """
     # put the opening page template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/cover_template.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/cover_template.png', 0, 0, width=1366, height=768)
 
     # set the font, size, and position of date
     pdf.setFont("Helvetica", 18)
@@ -232,7 +232,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put table of content template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/table_of_content.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/table_of_content.png', 0, 0, width=1366, height=768)
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
@@ -246,7 +246,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put executive summary template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/executive_summary.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/executive_summary.png', 0, 0, width=1366, height=768)
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
@@ -259,7 +259,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.showPage()
 
     # put the introduction template
-    pdf.drawInlineImage('sentiport/utils/Template/asset_template/Introduction.png', 0, 0, width=1366, height=768)
+    pdf.drawInlineImage('sentiport/utils/assets/Introduction.png', 0, 0, width=1366, height=768)
 
     # set font, size, and position of app name, app id, country id, and current date
     pdf.setFont("Helvetica-Oblique", 20)
@@ -295,7 +295,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put review analysis by time template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/review_analysis_by_time.png', 0, 0, width=1366,
+        f'sentiport/utils/assets/review_analysis_by_time.png', 0, 0, width=1366,
                         height=768)
 
     # set size and position of total review by time plot
@@ -319,7 +319,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.showPage()
 
     # put review analysis by time template
-    pdf.drawInlineImage(f'sentiport/utils/Template/asset_template/review_analysis_by_version.png', 0, 0, width=1366,
+    pdf.drawInlineImage(f'sentiport/utils/assets/review_analysis_by_version.png', 0, 0, width=1366,
                         height=768)
 
     # set size and position of total review by version plot
@@ -344,7 +344,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put sentiment analysis template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/sentiment_analysis.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/sentiment_analysis.png', 0, 0, width=1366, height=768)
 
     # set the size and position of sentiment by version plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_sentiment_version}"
@@ -382,7 +382,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put review analysis template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/review_language_analysis.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/review_language_analysis.png', 0, 0, width=1366, height=768)
 
     # set size and position of review language plot
     img = f"sentiport/artifacts/{temp_dir}/{fig_lang}"
@@ -406,7 +406,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put the bad reviewtemplate
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/template_negative_reviews.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/template_negative_reviews.png', 0, 0, width=1366, height=768)
 
     # set the position of bad review table
     try:
@@ -427,7 +427,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put good review template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/positive_review.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/positive_review.png', 0, 0, width=1366, height=768)
 
     # set position of good review table
     w, h = table1.wrap(0, 0)
@@ -445,7 +445,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     # put closing page template
     pdf.drawInlineImage(
-        f'sentiport/utils/Template/asset_template/get_other_features.png', 0, 0, width=1366, height=768)
+        f'sentiport/utils/assets/get_other_features.png', 0, 0, width=1366, height=768)
 
     # saving the report into pdf
     pdf.save()
