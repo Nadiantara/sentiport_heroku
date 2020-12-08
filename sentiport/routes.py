@@ -63,13 +63,13 @@ def scrape():
                 )
             ).start()
 
-            flash("""An message with pdf attachment will be sent to your email in 5 to 10 minutes,
-                please contact us if you recieve none""", 'success')
+            flash("""A message with pdf attachment will be sent to your email in 5 to 10 minutes,
+                please contact us if you recieving none""", 'success')
             return redirect(url_for('index'))
-        flash("""Wrong url or the app doesnt exist""", 'danger')
+        flash("""Wrong url or the app does not exist""", 'danger')
         return redirect(url_for('index'))
     else:
-        flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
+        flash("""Wrong Playstore URL or the app does not exist""", 'danger')
         return redirect(url_for('index'))
 
 
