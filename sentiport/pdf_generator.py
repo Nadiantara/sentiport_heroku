@@ -45,20 +45,20 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
 
     start = time.time()
     # scrapping current rating
-    company_logo = image_company_logo(PLAYSTORE_ID)
+    company_logo = image_company_logo(PLAYSTORE_ID, temp_dir)
     end = time.time()
     print(f"Company logo scrapping done! \n processing time: {(end-start)} sec")
 
     start = time.time()
     # call detect language plot and most language value
-    fig_lang, most_lang = plot_detect_language2(DATAFRAME)
+    fig_lang, most_lang = plot_detect_language2(DATAFRAME, temp_dir)
     end = time.time()
     print(
         f"Review Language done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
 
     start = time.time()
     # call overall rating plot
-    fig_overall_rating = plot_overall_rating(DATAFRAME)
+    fig_overall_rating = plot_overall_rating(DATAFRAME, temp_dir)
     end = time.time()
     print(
         f"Overall Rating done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
@@ -66,7 +66,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     start = time.time()
     # call total review by time plot and all the value
     fig_totalreview_time, MostReview_Month, MostReview_Month_Value = plot_totalreview_time(
-        sentiment_dataframe)
+        sentiment_dataframe, temp_dir)
     end = time.time()
     print(
         f"Total review-rating across months done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
@@ -74,7 +74,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     start = time.time()
     # call total review by version plot and all the value
     fig_totalreview_version, MostReview_Version, MostReview_Version_Value = plot_totalreview_version(
-        DATAFRAME)
+        DATAFRAME, temp_dir)
     end = time.time()
     print(
         f"Total review-rating across version done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
@@ -82,14 +82,14 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     start = time.time()
     # call total review sentiment plot and all the value
     fig_totalreview_sentiment, most_sentiment = plot_totalreview_sentiment(
-        sentiment_dataframe)
+        sentiment_dataframe, temp_dir)
     end = time.time()
     print(
         f"Overall review sentiment done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
 
     start = time.time()
     # call sentiment by time plot and all the value
-    fig_sentiment_time = plot_sentiment_time(sentiment_dataframe)
+    fig_sentiment_time = plot_sentiment_time(sentiment_dataframe, temp_dir)
     end = time.time()
     print(
         f"Review sentiment across time done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
@@ -97,7 +97,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     start = time.time()
     # call sentiment by version plot and all the value
     fig_sentiment_version, MostPos_Version, MostNeg_Version = plot_sentiment_version(
-        sentiment_dataframe)
+        sentiment_dataframe, temp_dir)
     end = time.time()
     print(
         f"Review sentiment across version done! \n processing time: {(end-start)} sec with {(len(DATAFRAME))} reviews")
@@ -141,7 +141,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     documentTitle = app_title_name
 
     # define canvas to create the report
-    pdf = canvas.Canvas(f"sentiport/artifacts/{fileName}", pagesize=(1366, 768))
+    pdf = canvas.Canvas(f"sentiport/artifacts/{temp_dir}/{fileName}", pagesize=(1366, 768))
 
     # get today's date
     today = date.today()
@@ -155,7 +155,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     """ COVER DEPAN """
     # put the opening page template
     pdf.drawInlineImage(
-        'sentiport/utils/assets/cover_template1.png', 0, 0, width=1366, height=768)
+        'sentiport/utils/assets/cover_template.png', 0, 0, width=1366, height=768)
 
     # set the font, size, and position of date
     pdf.setFont("Helvetica", 18)

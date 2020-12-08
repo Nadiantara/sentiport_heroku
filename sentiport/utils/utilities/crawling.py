@@ -114,7 +114,7 @@ def value_total_review(playstore_id):
     return total_review[0].findAll("span",{"class":""})[0].text
 
 
-def image_company_logo(playstore_id):
+def image_company_logo(playstore_id, temp_dir):
     target_url = 'https://play.google.com/store/apps/details?id='+playstore_id
     uClient = uReq(target_url)
     page_html = uClient.read()
@@ -124,7 +124,7 @@ def image_company_logo(playstore_id):
     link_gambar = total_review[0].find(
         "img", {"class": "T75of sHb2Xb"}).get('src')
     gambar = uReq(link_gambar)
-    output = open("sentiport/artifacts/logo_company.png", "wb")
+    output = open(f"sentiport/artifacts/{temp_dir}/logo_company.png", "wb")
     output.write(gambar.read())
     output.close()
-    return "sentiport/artifacts/logo_company.png"
+    return f"sentiport/artifacts/{temp_dir}/logo_company.png"

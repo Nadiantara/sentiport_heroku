@@ -109,18 +109,56 @@ def get_sentiment_score(bad_review):
 #  df_clean['rating'] = dataframe['rating']
 #  df_clean['word_count_score'] = dataframe['word_count_score']
 #  return df_clean
+def deEmojify(text):
+    '''
+    Remove emoji from review data
+    '''
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"\u2640-\u2642" 
+        u"\u2600-\u2B55"
+        u"\u200d"
+        u"\u23cf"
+        u"\u23e9"
+        u"\u231a"
+        u"\ufe0f"  # dingbats
+        u"\u3030"
+        "]+", flags = re.UNICODE)
+    text=regrex_pattern.sub(r'',text)
+    text=text.replace('\n',' ')
+    text=re.sub(' +', ' ', text)
+
+    return text
+
+def remove_emoji(dataframe):
+    '''
+    Preprocessing 2 : Remove emoji from review data
+    '''
+    print("Please wait, currently we're doing second preprocessing for your review data!")
+    dataframe = dataframe.copy()
+    dataframe['original_review'] = dataframe['original_review'].apply(
+        deEmojify)  # removing emoji
+    return dataframe
 
 def top_bad_review(dataframe, bad_review):
   dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
   dataframe = dataframe.rename(columns={'review':'original_review'})
   #dataframe = get_lowercase(dataframe)
+  dataframe = remove_emoji(dataframe)
   
-  bad_review = bad_review.rename(columns={'score':'worse_score'})
+  #bad_review = bad_review.rename(columns={'score':'score'})
   bad_review = pd.merge(bad_review, dataframe, on=['index','rating','word_count_score'], how='inner')
-  bad_review = bad_review[['original_review','worse_score']]
-  bad_review = bad_review.sort_values('worse_score', ascending=True).reset_index(drop=True)
-  bad_review['worse_score'] = -(bad_review['worse_score']/bad_review['worse_score'][0])
+  bad_review = bad_review[['original_review','score']]
+  bad_review = bad_review.sort_values('score', ascending=True).reset_index(drop=True)
+  bad_review['score'] = -(bad_review['score']/bad_review['score'][0])
   bad_review = bad_review[:5]
   return bad_review
 
@@ -141,17 +179,20 @@ def get_good_review(dataframe):
   good_review = good_review[:100]
   return good_review
 
+
 def top_good_review(dataframe, good_review):
-  dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
-  dataframe = dataframe.rename(columns={'review':'original_review'})
-  #dataframe = get_lowercase(dataframe)
-  
-  good_review = good_review.rename(columns={'score':'good_score'})
-  good_review = pd.merge(good_review, dataframe, on=['index','rating','word_count_score'], how='inner')
-  good_review = good_review[['original_review','good_score']]
-  good_review = good_review.sort_values('good_score', ascending=False).reset_index(drop=True)
-  good_review['good_score'] = good_review['good_score']/good_review['good_score'][0]
+  dataframe = dataframe.rename(columns={'review': 'original_review'})
+  # dataframe = get_lowercase(dataframe)
+  dataframe = remove_emoji(dataframe)
+
+  #good_review = good_review.rename(columns={'score':'score'})
+  good_review = pd.merge(good_review, dataframe, on=[
+                         'index', 'rating', 'word_count_score'], how='inner')
+  good_review = good_review[['original_review', 'score']]
+  good_review = good_review.sort_values(
+      'score', ascending=False).reset_index(drop=True)
+  good_review['score'] = good_review['score']/good_review['score'][0]
   good_review = good_review[:5]
   return good_review
 
@@ -228,30 +269,70 @@ def add_enter(dataframe, row_number):
     return dataframe
 
 
+def tag_words(dataframe, row_number):
+  words = dataframe.original_review[row_number].split()
+
+  senti_words = []
+  sent_words = []
+  for word in words:
+    sent_words.append(word)
+    senti_words.append(TextBlob(word).sentiment.polarity)
+
+  senti_dict = [(sent_words[idx], senti_words[idx])
+                for idx in range(len(words))]
+
+  new_text = ""
+  i = 0
+  for word, senti_score in senti_dict:
+    if senti_score > 0:
+      if i == 0:
+        new_text = "<font color=#199600><b>" + word + "</b></font>"
+      elif i > 0:
+        new_text += " " + "<font color=#199600><b>" + word + "</b></font>"
+    elif senti_score < 0:
+      if i == 0:
+        new_text = "<font color=#8a0000><b>" + word + "</b></font>"
+      elif i > 0:
+        new_text += " " + "<font color=#8a0000><b>" + word + "</b></font>"
+    elif senti_score == 0:
+      if i == 0:
+        new_text = word
+      elif i > 0:
+        new_text += " " + word
+    i += 1
+
+  new_text
+
+  dataframe['original_review'].iloc[row_number] = new_text
+  return dataframe
 
 def transform_bad_review(bad_review):
-  bad_review = bad_review.copy()
-  bad_review['worse_score'] = round(bad_review['worse_score'], 2)
-  bad_review = bad_review[['original_review', 'worse_score']]
+  bad_review['score'] = round(bad_review['score'], 2)
+  bad_review = bad_review[['original_review', 'score']]
   sentence_rank_1 = bad_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
 
   for i in range(len(sentence_rank_1)):
     sentence_rank_1 = add_enter(sentence_rank_1, i)
+    sentence_rank_1 = tag_words(sentence_rank_1, i)
 
-  sentence_rank_1 = sentence_rank_1[['original_review', 'worse_score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
+  sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
   return sentence_rank_1
 
+
 def transform_good_review(good_review):
-  good_review = good_review.copy()
-  good_review['good_score'] = round(good_review['good_score'], 2)
-  good_review = good_review[['original_review', 'good_score']]
-  sentence_rank_1 = good_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
+  good_review['score'] = round(good_review['score'], 2)
+  good_review = good_review[['original_review', 'score']]
+  sentence_rank_1 = good_review[:50].reset_index(
+      drop=True).reset_index(col_fill='class', col_level=1, drop=True)
 
   for i in range(len(sentence_rank_1)):
     sentence_rank_1 = add_enter(sentence_rank_1, i)
+    sentence_rank_1 = tag_words(sentence_rank_1, i)
 
-  sentence_rank_1 = sentence_rank_1[['original_review', 'good_score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
+  sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
+      columns={'original_review': 'Reviews'}, inplace=False)
   return sentence_rank_1
+
 
 def convert_to_pdf(DATAFRAME):
 
