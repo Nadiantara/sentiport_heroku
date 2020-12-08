@@ -24,6 +24,6 @@ venv.bak/
 # All generated files, except image templates
 **.pdf
 **.png
-!sentiport/utils/Template/**
+!sentiport/utils/assets/**
 
 .*

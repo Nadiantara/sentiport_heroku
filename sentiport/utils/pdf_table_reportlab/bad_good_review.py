@@ -9,8 +9,11 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus import Table
 from reportlab.platypus import TableStyle
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from math import log
-
+styleSheet = getSampleStyleSheet()
 translator = Translator()
 
 def get_word_count(DATAFRAME):
@@ -106,18 +109,56 @@ def get_sentiment_score(bad_review):
 #  df_clean['rating'] = dataframe['rating']
 #  df_clean['word_count_score'] = dataframe['word_count_score']
 #  return df_clean
+def deEmojify(text):
+    '''
+    Remove emoji from review data
+    '''
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"\u2640-\u2642" 
+        u"\u2600-\u2B55"
+        u"\u200d"
+        u"\u23cf"
+        u"\u23e9"
+        u"\u231a"
+        u"\ufe0f"  # dingbats
+        u"\u3030"
+        "]+", flags = re.UNICODE)
+    text=regrex_pattern.sub(r'',text)
+    text=text.replace('\n',' ')
+    text=re.sub(' +', ' ', text)
+
+    return text
+
+def remove_emoji(dataframe):
+    '''
+    Preprocessing 2 : Remove emoji from review data
+    '''
+    print("Please wait, currently we're doing second preprocessing for your review data!")
+    dataframe = dataframe.copy()
+    dataframe['original_review'] = dataframe['original_review'].apply(
+        deEmojify)  # removing emoji
+    return dataframe
 
 def top_bad_review(dataframe, bad_review):
   dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
   dataframe = dataframe.rename(columns={'review':'original_review'})
   #dataframe = get_lowercase(dataframe)
+  dataframe = remove_emoji(dataframe)
   
-  bad_review = bad_review.rename(columns={'score':'worse_score'})
+  #bad_review = bad_review.rename(columns={'score':'score'})
   bad_review = pd.merge(bad_review, dataframe, on=['index','rating','word_count_score'], how='inner')
-  bad_review = bad_review[['original_review','worse_score']]
-  bad_review = bad_review.sort_values('worse_score', ascending=True).reset_index(drop=True)
-  bad_review['worse_score'] = -(bad_review['worse_score']/bad_review['worse_score'][0])
+  bad_review = bad_review[['original_review','score']]
+  bad_review = bad_review.sort_values('score', ascending=True).reset_index(drop=True)
+  bad_review['score'] = -(bad_review['score']/bad_review['score'][0])
   bad_review = bad_review[:5]
   return bad_review
 
@@ -138,17 +179,20 @@ def get_good_review(dataframe):
   good_review = good_review[:100]
   return good_review
 
+
 def top_good_review(dataframe, good_review):
-  dataframe = dataframe.copy()
   dataframe = dataframe.reset_index()
-  dataframe = dataframe.rename(columns={'review':'original_review'})
-  #dataframe = get_lowercase(dataframe)
-  
-  good_review = good_review.rename(columns={'score':'good_score'})
-  good_review = pd.merge(good_review, dataframe, on=['index','rating','word_count_score'], how='inner')
-  good_review = good_review[['original_review','good_score']]
-  good_review = good_review.sort_values('good_score', ascending=False).reset_index(drop=True)
-  good_review['good_score'] = good_review['good_score']/good_review['good_score'][0]
+  dataframe = dataframe.rename(columns={'review': 'original_review'})
+  # dataframe = get_lowercase(dataframe)
+  dataframe = remove_emoji(dataframe)
+
+  #good_review = good_review.rename(columns={'score':'score'})
+  good_review = pd.merge(good_review, dataframe, on=[
+                         'index', 'rating', 'word_count_score'], how='inner')
+  good_review = good_review[['original_review', 'score']]
+  good_review = good_review.sort_values(
+      'score', ascending=False).reset_index(drop=True)
+  good_review['score'] = good_review['score']/good_review['score'][0]
   good_review = good_review[:5]
   return good_review
 
@@ -225,30 +269,70 @@ def add_enter(dataframe, row_number):
     return dataframe
 
 
+def tag_words(dataframe, row_number):
+  words = dataframe.original_review[row_number].split()
+
+  senti_words = []
+  sent_words = []
+  for word in words:
+    sent_words.append(word)
+    senti_words.append(TextBlob(word).sentiment.polarity)
+
+  senti_dict = [(sent_words[idx], senti_words[idx])
+                for idx in range(len(words))]
+
+  new_text = ""
+  i = 0
+  for word, senti_score in senti_dict:
+    if senti_score > 0:
+      if i == 0:
+        new_text = "<font color=#199600><b>" + word + "</b></font>"
+      elif i > 0:
+        new_text += " " + "<font color=#199600><b>" + word + "</b></font>"
+    elif senti_score < 0:
+      if i == 0:
+        new_text = "<font color=#8a0000><b>" + word + "</b></font>"
+      elif i > 0:
+        new_text += " " + "<font color=#8a0000><b>" + word + "</b></font>"
+    elif senti_score == 0:
+      if i == 0:
+        new_text = word
+      elif i > 0:
+        new_text += " " + word
+    i += 1
+
+  new_text
+
+  dataframe['original_review'].iloc[row_number] = new_text
+  return dataframe
 
 def transform_bad_review(bad_review):
-  bad_review = bad_review.copy()
-  bad_review['worse_score'] = round(bad_review['worse_score'], 2)
-  bad_review = bad_review[['original_review', 'worse_score']]
+  bad_review['score'] = round(bad_review['score'], 2)
+  bad_review = bad_review[['original_review', 'score']]
   sentence_rank_1 = bad_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
 
   for i in range(len(sentence_rank_1)):
     sentence_rank_1 = add_enter(sentence_rank_1, i)
+    sentence_rank_1 = tag_words(sentence_rank_1, i)
 
-  sentence_rank_1 = sentence_rank_1[['original_review', 'worse_score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
+  sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
   return sentence_rank_1
 
+
 def transform_good_review(good_review):
-  good_review = good_review.copy()
-  good_review['good_score'] = round(good_review['good_score'], 2)
-  good_review = good_review[['original_review', 'good_score']]
-  sentence_rank_1 = good_review[:50].reset_index(drop=True).reset_index(col_fill='class', col_level=1, drop=True)
+  good_review['score'] = round(good_review['score'], 2)
+  good_review = good_review[['original_review', 'score']]
+  sentence_rank_1 = good_review[:50].reset_index(
+      drop=True).reset_index(col_fill='class', col_level=1, drop=True)
 
   for i in range(len(sentence_rank_1)):
     sentence_rank_1 = add_enter(sentence_rank_1, i)
+    sentence_rank_1 = tag_words(sentence_rank_1, i)
 
-  sentence_rank_1 = sentence_rank_1[['original_review', 'good_score']].rename(columns = {'original_review':'Reviews'}, inplace = False)
+  sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
+      columns={'original_review': 'Reviews'}, inplace=False)
   return sentence_rank_1
+
 
 def convert_to_pdf(DATAFRAME):
 
@@ -362,3 +446,146 @@ def convert_to_pdf(DATAFRAME):
   
   pdf.build(elems)
 
+
+def good_bad_table(DATAFRAME):
+  styles = getSampleStyleSheet()
+  style = styles["BodyText"]
+  ps = ParagraphStyle('title', fontSize=20, leading=22)
+
+  bad_review = get_top5_bad_review(DATAFRAME)
+  bad_review = transform_bad_review(bad_review)
+  bad_review = bad_review[bad_review['score'] < 0]
+  good_review = get_top5_good_review(DATAFRAME)
+  good_review = transform_good_review(good_review)
+  good_review = good_review[good_review['score'] > 0]
+
+  #bad_tab = bad_review.reset_index(drop=True).T.reset_index().T.values.tolist()
+  #pos_tab = good_review.reset_index(drop=True).T.reset_index().T.values.tolist()
+
+  list_bad_reviews = ['', '', '', '', '']
+  list_bad_scores = ['', '', '', '', '']
+  list_good_reviews = ['', '', '', '', '']
+  list_good_scores = ['', '', '', '', '']
+
+  for i in range(len(bad_review)):
+      list_bad_reviews[i] = bad_review.Reviews[i]
+      list_bad_scores[i] = bad_review.score[i]
+
+  for i in range(len(good_review)):
+      list_good_reviews[i] = good_review.Reviews[i]
+      list_good_scores[i] = good_review.score[i]
+
+  bad_tab = [['Reviews', 'score'],
+             [Paragraph(list_bad_reviews[0], ps), list_bad_scores[0]],
+             [Paragraph(list_bad_reviews[1], ps), list_bad_scores[1]],
+             [Paragraph(list_bad_reviews[2], ps), list_bad_scores[2]],
+             [Paragraph(list_bad_reviews[3], ps), list_bad_scores[3]],
+             [Paragraph(list_bad_reviews[4], ps), list_bad_scores[4]]]
+  pos_tab = [['Reviews', 'score'],
+             [Paragraph(list_good_reviews[0], ps), list_good_scores[0]],
+             [Paragraph(list_good_reviews[1], ps), list_good_scores[1]],
+             [Paragraph(list_good_reviews[2], ps), list_good_scores[2]],
+             [Paragraph(list_good_reviews[3], ps), list_good_scores[3]],
+             [Paragraph(list_good_reviews[4], ps), list_good_scores[4]]]
+
+  negative_table = Table(bad_tab, [1180, 100],
+                         rowHeights=(40, 105, 105, 105, 105, 105))
+  positive_table = Table(pos_tab, [1180, 100],
+                         rowHeights=(40, 105, 105, 105, 105, 105))
+  # Set font style
+  font = TableStyle([
+      ('FONTNAME', (0, 0), (-1, 5), 'Helvetica-Bold'),
+      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+      ('FONTSIZE', (0, 0), (1, 1), 15),
+      ('FONTSIZE', (0, 1), (1, 1), 21),
+      ('FONTSIZE', (0, 2), (1, 2), 21),
+      ('FONTSIZE', (0, 3), (1, 3), 21),
+      ('FONTSIZE', (0, 4), (1, 4), 21),
+      ('FONTSIZE', (0, 5), (1, 5), 21),
+      #('FONTSIZE', (0,1), (-1,-1), 15),
+  ])
+  negative_table.setStyle(font)
+  positive_table.setStyle(font)
+  # Set Table padding
+  padding = TableStyle([
+      ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+      ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+      ('ALIGN', (0, 1), (-1, 0), 'LEFT'),
+      ('BOTTOMPADDING', (0, 0), (-1, 0), 15),
+      ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+      ('TOPPADDING', (0, 0), (-1, 0), 12),
+      ('TOPPADDING', (0, 1), (-1, -1), 8),
+      ('LEADING', (0, 1), (1, 1), 23),
+      ('LEADING', (0, 2), (1, 2), 23),
+      ('LEADING', (0, 3), (1, 3), 23),
+      ('LEADING', (0, 4), (1, 4), 23),
+      ('LEADING', (0, 5), (1, 5), 23),
+
+      ('BACKGROUND', (0, 1), (-1, -1), colors.burlywood),
+  ])
+  negative_table.setStyle(padding)
+  positive_table.setStyle(padding)
+
+  # 3) Alternate backgroud color
+  cx = colors.white
+  c0 = colors.black
+  c1 = colors.HexColor('#9f8159')
+  c2 = colors.HexColor('#b59a76')
+  c3 = colors.HexColor('#c2aa8a')
+  c4 = colors.HexColor('#c9b69d')
+  c5 = colors.HexColor('#dcd3c4')
+
+  list_color = [c0, cx, cx, cx, cx, cx]
+
+  row = len(bad_review)
+  if row == 0:
+    list_color = [c0, cx, cx, cx, cx, cx]
+  elif row == 1:
+    list_color = [c0, c1, cx, cx, cx, cx]
+  elif row == 2:
+    list_color = [c0, c1, c2, cx, cx, cx]
+  elif row == 3:
+    list_color = [c0, c1, c2, c3, cx, cx]
+  elif row == 4:
+    list_color = [c0, c1, c2, c3, c4, cx]
+  elif row == 5:
+    list_color = [c0, c1, c2, c3, c4, c5]
+
+  color = TableStyle([
+      ('BACKGROUND', (0, 0), (3, 0), list_color[0]),
+      ('BACKGROUND', (0, 1), (2, 1), list_color[1]),
+      ('BACKGROUND', (0, 2), (2, 2), list_color[2]),
+      ('BACKGROUND', (0, 3), (2, 3), list_color[3]),
+      ('BACKGROUND', (0, 4), (2, 4), list_color[4]),
+      ('BACKGROUND', (0, 5), (2, 5), list_color[5]),
+  ]
+  )
+
+  row = len(good_review)
+  if row == 0:
+    list_color = [c0, cx, cx, cx, cx, cx]
+  elif row == 1:
+    list_color = [c0, c1, cx, cx, cx, cx]
+  elif row == 2:
+    list_color = [c0, c1, c2, cx, cx, cx]
+  elif row == 3:
+    list_color = [c0, c1, c2, c3, cx, cx]
+  elif row == 4:
+    list_color = [c0, c1, c2, c3, c4, cx]
+  elif row == 5:
+    list_color = [c0, c1, c2, c3, c4, c5]
+
+  color1 = TableStyle([
+      ('BACKGROUND', (0, 0), (3, 0), list_color[0]),
+      ('BACKGROUND', (0, 1), (2, 1), list_color[1]),
+      ('BACKGROUND', (0, 2), (2, 2), list_color[2]),
+      ('BACKGROUND', (0, 3), (2, 3), list_color[3]),
+      ('BACKGROUND', (0, 4), (2, 4), list_color[4]),
+      ('BACKGROUND', (0, 5), (2, 5), list_color[5]),
+  ]
+  )
+
+  negative_table.setStyle(color)
+  positive_table.setStyle(color1)
+  return negative_table, positive_table

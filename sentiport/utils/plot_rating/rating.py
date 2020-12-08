@@ -61,4 +61,4 @@ def plot_overall_rating(dataframe, temp_dir):
 
     plt.savefig(f"sentiport/artifacts/{temp_dir}/fig_overall_rating.png",
                 bbox_inches='tight')
-    return f"fig_overall_rating.png"
+    return f"sentiport/artifacts/{temp_dir}/fig_overall_rating.png"
