@@ -9,8 +9,11 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus import Table
 from reportlab.platypus import TableStyle
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from math import log
-
+styleSheet = getSampleStyleSheet()
 translator = Translator()
 
 def get_word_count(DATAFRAME):
@@ -362,3 +365,146 @@ def convert_to_pdf(DATAFRAME):
   
   pdf.build(elems)
 
+
+def good_bad_table(DATAFRAME):
+  styles = getSampleStyleSheet()
+  style = styles["BodyText"]
+  ps = ParagraphStyle('title', fontSize=20, leading=22)
+
+  bad_review = get_top5_bad_review(DATAFRAME)
+  bad_review = transform_bad_review(bad_review)
+  bad_review = bad_review[bad_review['score'] < 0]
+  good_review = get_top5_good_review(DATAFRAME)
+  good_review = transform_good_review(good_review)
+  good_review = good_review[good_review['score'] > 0]
+
+  #bad_tab = bad_review.reset_index(drop=True).T.reset_index().T.values.tolist()
+  #pos_tab = good_review.reset_index(drop=True).T.reset_index().T.values.tolist()
+
+  list_bad_reviews = ['', '', '', '', '']
+  list_bad_scores = ['', '', '', '', '']
+  list_good_reviews = ['', '', '', '', '']
+  list_good_scores = ['', '', '', '', '']
+
+  for i in range(len(bad_review)):
+      list_bad_reviews[i] = bad_review.Reviews[i]
+      list_bad_scores[i] = bad_review.score[i]
+
+  for i in range(len(good_review)):
+      list_good_reviews[i] = good_review.Reviews[i]
+      list_good_scores[i] = good_review.score[i]
+
+  bad_tab = [['Reviews', 'score'],
+             [Paragraph(list_bad_reviews[0], ps), list_bad_scores[0]],
+             [Paragraph(list_bad_reviews[1], ps), list_bad_scores[1]],
+             [Paragraph(list_bad_reviews[2], ps), list_bad_scores[2]],
+             [Paragraph(list_bad_reviews[3], ps), list_bad_scores[3]],
+             [Paragraph(list_bad_reviews[4], ps), list_bad_scores[4]]]
+  pos_tab = [['Reviews', 'score'],
+             [Paragraph(list_good_reviews[0], ps), list_good_scores[0]],
+             [Paragraph(list_good_reviews[1], ps), list_good_scores[1]],
+             [Paragraph(list_good_reviews[2], ps), list_good_scores[2]],
+             [Paragraph(list_good_reviews[3], ps), list_good_scores[3]],
+             [Paragraph(list_good_reviews[4], ps), list_good_scores[4]]]
+
+  negative_table = Table(bad_tab, [1180, 100],
+                         rowHeights=(40, 105, 105, 105, 105, 105))
+  positive_table = Table(pos_tab, [1180, 100],
+                         rowHeights=(40, 105, 105, 105, 105, 105))
+  # Set font style
+  font = TableStyle([
+      ('FONTNAME', (0, 0), (-1, 5), 'Helvetica-Bold'),
+      ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+      ('FONTSIZE', (0, 0), (1, 1), 15),
+      ('FONTSIZE', (0, 1), (1, 1), 21),
+      ('FONTSIZE', (0, 2), (1, 2), 21),
+      ('FONTSIZE', (0, 3), (1, 3), 21),
+      ('FONTSIZE', (0, 4), (1, 4), 21),
+      ('FONTSIZE', (0, 5), (1, 5), 21),
+      #('FONTSIZE', (0,1), (-1,-1), 15),
+  ])
+  negative_table.setStyle(font)
+  positive_table.setStyle(font)
+  # Set Table padding
+  padding = TableStyle([
+      ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+      ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
+      ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+      ('ALIGN', (0, 1), (-1, 0), 'LEFT'),
+      ('BOTTOMPADDING', (0, 0), (-1, 0), 15),
+      ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+      ('TOPPADDING', (0, 0), (-1, 0), 12),
+      ('TOPPADDING', (0, 1), (-1, -1), 8),
+      ('LEADING', (0, 1), (1, 1), 23),
+      ('LEADING', (0, 2), (1, 2), 23),
+      ('LEADING', (0, 3), (1, 3), 23),
+      ('LEADING', (0, 4), (1, 4), 23),
+      ('LEADING', (0, 5), (1, 5), 23),
+
+      ('BACKGROUND', (0, 1), (-1, -1), colors.burlywood),
+  ])
+  negative_table.setStyle(padding)
+  positive_table.setStyle(padding)
+
+  # 3) Alternate backgroud color
+  cx = colors.white
+  c0 = colors.black
+  c1 = colors.HexColor('#9f8159')
+  c2 = colors.HexColor('#b59a76')
+  c3 = colors.HexColor('#c2aa8a')
+  c4 = colors.HexColor('#c9b69d')
+  c5 = colors.HexColor('#dcd3c4')
+
+  list_color = [c0, cx, cx, cx, cx, cx]
+
+  row = len(bad_review)
+  if row == 0:
+    list_color = [c0, cx, cx, cx, cx, cx]
+  elif row == 1:
+    list_color = [c0, c1, cx, cx, cx, cx]
+  elif row == 2:
+    list_color = [c0, c1, c2, cx, cx, cx]
+  elif row == 3:
+    list_color = [c0, c1, c2, c3, cx, cx]
+  elif row == 4:
+    list_color = [c0, c1, c2, c3, c4, cx]
+  elif row == 5:
+    list_color = [c0, c1, c2, c3, c4, c5]
+
+  color = TableStyle([
+      ('BACKGROUND', (0, 0), (3, 0), list_color[0]),
+      ('BACKGROUND', (0, 1), (2, 1), list_color[1]),
+      ('BACKGROUND', (0, 2), (2, 2), list_color[2]),
+      ('BACKGROUND', (0, 3), (2, 3), list_color[3]),
+      ('BACKGROUND', (0, 4), (2, 4), list_color[4]),
+      ('BACKGROUND', (0, 5), (2, 5), list_color[5]),
+  ]
+  )
+
+  row = len(good_review)
+  if row == 0:
+    list_color = [c0, cx, cx, cx, cx, cx]
+  elif row == 1:
+    list_color = [c0, c1, cx, cx, cx, cx]
+  elif row == 2:
+    list_color = [c0, c1, c2, cx, cx, cx]
+  elif row == 3:
+    list_color = [c0, c1, c2, c3, cx, cx]
+  elif row == 4:
+    list_color = [c0, c1, c2, c3, c4, cx]
+  elif row == 5:
+    list_color = [c0, c1, c2, c3, c4, c5]
+
+  color1 = TableStyle([
+      ('BACKGROUND', (0, 0), (3, 0), list_color[0]),
+      ('BACKGROUND', (0, 1), (2, 1), list_color[1]),
+      ('BACKGROUND', (0, 2), (2, 2), list_color[2]),
+      ('BACKGROUND', (0, 3), (2, 3), list_color[3]),
+      ('BACKGROUND', (0, 4), (2, 4), list_color[4]),
+      ('BACKGROUND', (0, 5), (2, 5), list_color[5]),
+  ]
+  )
+
+  negative_table.setStyle(color)
+  positive_table.setStyle(color1)
+  return negative_table, positive_table
