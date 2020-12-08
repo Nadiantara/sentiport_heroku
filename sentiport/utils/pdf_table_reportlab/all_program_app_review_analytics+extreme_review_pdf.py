@@ -105,6 +105,7 @@ from tqdm.notebook import tnrange, tqdm_notebook
 translator = Translator()
 
 nltk.download('stopwords')
+nltk.download("brown")
 nltk.download("popular")
 nltk.download('punkt')
 nltk.download('vader_lexicon')

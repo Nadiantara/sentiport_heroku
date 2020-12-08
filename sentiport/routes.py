@@ -64,7 +64,7 @@ def scrape():
             ).start()
 
             flash("""A message with pdf attachment will be sent to your email in 5 to 10 minutes,
-                please contact us if you recieving none""", 'success')
+                please contact us if you recieving none or try to refresh and clean your cache (ctrl+shift+r)""", 'success')
             return redirect(url_for('index'))
         flash("""Wrong url or the app does not exist""", 'danger')
         return redirect(url_for('index'))
@@ -74,7 +74,7 @@ def scrape():
 
 
 def get_id(toParse):
-    regex = r'\?id=([a-zA-Z\.]+)'
+    regex = r'\?id=([a-zA-Z0-9\.]+)'
     app_id = re.findall(regex, toParse)[0]
     return app_id
 
