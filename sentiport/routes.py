@@ -23,21 +23,27 @@ def index():
 
 @app.route("/status/<thread_id>", methods=['GET'])
 def status(thread_id):
-    return {
-        "status": 200, 
-        "thread_id": thread_id, 
-        "task_status": {
-            "isRunning": threads[thread_id]["is_running"], 
-            "isError": threads[thread_id]["is_error"]
+    try:
+        return {
+            "status": 200, 
+            "thread_id": thread_id, 
+            "task_status": {
+                "isRunning": threads[thread_id]["is_running"], 
+                "isError": threads[thread_id]["is_error"],
+                "errorMessage": threads[thread_id]["error_message"]
+                }
             }
+    except Exception as e:
+        return {
+            "status": 500,
+            "error": str(e)
         }
-    # return json.dumps({"status": 200, "thread_id": 1, "task_status": "baik-baik saja"})
 
 
 @app.route("/scrape", methods=['GET', 'POST'])
 def scrape():
     if request.method == 'POST':
-        # get some data
+        # get form data
         playstore_id = request.form['playstore_id']
         country = request.form['country_code']
         targetmail = request.form['user_email']
@@ -60,11 +66,11 @@ def scrape():
             "error_message": ""
         }
 
-        # return something
-        # DEBUG
         status_url = url_for("status", thread_id=thread_id)
-        response = make_response(redirect(url_for('index')))
-        response.set_cookie("status_url", status_url)
+        response = make_response(render_template(
+            'status.html',
+            status_url = status_url 
+            ))
 
         return response
 

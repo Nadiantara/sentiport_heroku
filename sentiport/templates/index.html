@@ -40,4 +40,6 @@
         </div>
     </body>
     <script src="{{ url_for('static', filename='status.js') }}"></script>
+    {% block status_checker %}
+    {% endblock status_checker %}
 </html>

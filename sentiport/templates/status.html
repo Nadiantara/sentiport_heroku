@@ -1,0 +1,7 @@
+{% extends "index.html" %}
+{% block status_checker %}
+<!-- Starts a function call when thread starts -->
+<script>
+    periodicStatusCheck("{{ status_url }}")
+</script>
+{% endblock status_checker %}

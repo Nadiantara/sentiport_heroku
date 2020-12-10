@@ -1,29 +1,32 @@
 function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
+    const value = `; ${document.cookie}`
+    const parts = value.split(`; ${name}=`)
+    if (parts.length === 2) return parts.pop().split(';').shift()
     return null
 }
 
-async function periodicStatusCheck() {
-    statusURL = getCookie("status_url")
-    statusDiv = document.getElementById("status")
-    if(statusURL) {
-        status = await fetch(statusURL)
-                        .then(res => res.json())
-                        .then(res => {
-                            statusDiv.innerHTML = `isRunning: ${res["task_status"]["isRunning"]}, isError: ${res["task_status"]["isError"]}`
-                        }) 
-                        .catch(err => console.log(err))
+async function periodicStatusCheck(statusURL="") {
+    let statusDiv = document.getElementById("status")
+    let isActive = false
+    await fetch(statusURL)
+            .then(res => res.json())
+            .then(res => {
+                let isRunning = res["task_status"]["isRunning"]
+                let isError = res["task_status"]["isError"]
+                statusDiv.innerHTML = `isRunning: ${isRunning}, isError: ${isError}`
+                
+                if (isRunning && !isError) {
+                    isActive = true
+                }
+            }) 
+            .catch(err => console.log(err))
+
+    if (isActive){
+        setTimeout(() => periodicStatusCheck(statusURL), 2000)
     }
-    else {
-        statusDiv.innerHTML = "nothing here"
-    }
-        
-    setTimeout(() => periodicStatusCheck(), 2000)
 }
 
-function getStatus(statusURL) {
+function TO_BE_DELETED_getStatus(statusURL) {
     fetch(statusURL)
     .then(res => res.json())
     .then(res => {
@@ -36,7 +39,7 @@ function getStatus(statusURL) {
     .catch(err => console.log(err))
 }
 
-function onFormSubmit() {
+function TO_BE_DELETED_onFormSubmit() {
     let playstoreID = document.getElementById("playstore_id")
     let countryID = document.getElementById("country_code")
     let email = document.getElementById("user_email")
