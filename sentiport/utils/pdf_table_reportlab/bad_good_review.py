@@ -303,7 +303,9 @@ def tag_words(dataframe, row_number):
 
   new_text
 
-  dataframe['original_review'].iloc[row_number] = new_text
+  # dataframe['original_review'].iloc[row_number] = new_text
+  dataframe.iloc[row_number, dataframe.columns.get_loc('original_review')] = new_text
+
   return dataframe
 
 def transform_bad_review(bad_review):

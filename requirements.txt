@@ -44,5 +44,5 @@ tqdm==4.47.0
 Werkzeug==1.0.1
 wordcloud==1.8.0
 WTForms==2.3.3
-email_validator
-cycler==0.10.0
+email-validator==1.1.2
+dnspython==2.0.0

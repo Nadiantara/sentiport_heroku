@@ -1,59 +1,60 @@
 {% extends 'root.html' %}
 {% block content %}
-        <!-- Bootstrap flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        <div class="p-4">
-            <h1>Sentiport</h1>
-            <form method="POST" action="{{url_for('scrape')}}">
-                {{ form.hidden_tag() }}
-                <div class="form-group w-50">
-                    <!-- form.app_id.label -->
-                    <a class="my-0 py-0">Playstore URL</a>
-                    {{ form.app_id(class="form-control") }}
-                    {% for error in form.app_id.errors %}
-                    <span class="text-danger">{{ error }}</span>
-                    {% endfor %}
-                </div>
-                    <div class="form-group w-50">
-                        <!-- form.app_id.label-->
-                        <a class="my-0 py-0">Your Email</a>
-                        {{ form.email(class="form-control") }}
-                        {% for error in form.email.errors %}
-                        <span class="text-danger">{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                <div class="form-group w-50">
-                    <a class="my-0 py-0">Country</a>
-                    <select name="country_code" id="country_code" required="required" style="width:200px">
-                        <option value="" label="Select a country ... " selected="selected">Select a country ... </option>
-                        <optgroup id="country-optgroup-Africa" label="Majority English Speaking Country">
-                            <option value="AU" label="Australia">Australia</option>
-                            <option value="BW" label="Botswana">Botswana</option>
-                            <option value="CD" label="Canada">Canada</option>
-                            <option value="KE" label="Kenya">Kenya</option>
-                            <option value="NZ" label="New Zealand">New Zealand</option>
-                            <option value="NG" label="Nigeria">Nigeria</option>
-                            <option value="SG" label="Singapore">Singapore</option>
-                            <option value="ZA" label="South Africa">South Africa</option>
-                            <option value="GB" label="United Kingdom">United Kingdom</option>
-                            <option value="US" label="United States">United States</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <div class="form-group"></div>
-                    <button type="submit" class="btn btn-outline-info">Submit</button>
-                </div>
-            </form>
+<!-- Bootstrap flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<div class="p-4">
+    <h1>Sentiport</h1>
+    <form method="POST" action="{{url_for('scrape')}}">
+        {{ form.hidden_tag() }}
+        <div class="form-group w-50">
+            <!-- form.app_id.label -->
+            <a class="my-0 py-0">Playstore URL</a>
+            {{ form.app_id(class="form-control") }}
+            {% for error in form.app_id.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
         </div>
-    </body>
+        <div class="form-group w-50">
+            <!-- form.app_id.label-->
+            <a class="my-0 py-0">Your Email</a>
+            {{ form.email(class="form-control") }}
+            {% for error in form.email.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+        <div class="form-group w-50">
+            <a class="my-0 py-0">Country</a>
+            <select name="country_code" id="country_code" required="required" style="width:200px">
+                <option value="US" label="Select country ...  " selected="selected">United States (default) </option>
+                <optgroup id="country-optgroup-Africa" label="English Majority speaking countries">
+                    <option value="US" label="United States">United States</option>
+                    <option value="GB" label="United Kingdom">United Kingdom</option>
+                    <option value="AU" label="Australia">Australia</option>
+                    <option value="BW" label="Botswana">Botswana</option>
+                    <option value="CD" label="Canada">Canada</option>
+                    <option value="KE" label="Kenya">Kenya</option>
+                    <option value="NZ" label="New Zealand">New Zealand</option>
+                    <option value="NG" label="Nigeria">Nigeria</option>
+                    <option value="SG" label="Singapore">Singapore</option>
+                    <option value="ZA" label="South Africa">South Africa</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="form-group"></div>
+        <button type="submit" class="btn btn-outline-info">Submit</button>
+</div>
+</form>
+</div>
+</body>
+
 </html>
 
 {% endblock content %}
