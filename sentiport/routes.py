@@ -60,12 +60,12 @@ def scrape():
         flash("""Wrong url or the application doesnt exist""", 'danger')
         return redirect(url_for('index'))
     else:
-        flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
+        flash("""Wrong Playstore URL or the application does not exist""", 'danger')
         return redirect(url_for('index'))
 
 
 def get_id(toParse):
-    regex = r'\?id=([a-zA-Z\.]+)'
+    regex = r'\?id=([a-zA-Z0-9\.]+)'
     app_id = re.findall(regex, toParse)[0]
     return app_id
 
