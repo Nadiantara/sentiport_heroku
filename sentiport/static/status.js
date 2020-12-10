@@ -5,16 +5,63 @@ function getCookie(name) {
     return null
 }
 
-async function periodicStatusCheck(statusURL="") {
-    let statusDiv = document.getElementById("status")
+function initRenderTaskAlert(
+    threadID,
+    playstoreID,
+    countryCode,
+    userEmail 
+) {
+    // define html
+    alertHTML = `
+    <div id="${threadID}" class="alert alert-info alert-dismissible fade show" role="alert">
+        <h4 id="${threadID}-heading" class="alert-heading">Working on it..</h4>
+        <hr>
+        <div class="mb-0">
+            Sending <strong>${playstoreID}</strong> <strong>${countryCode}</strong> report to <strong>${userEmail}</strong>
+        </div>
+    </div>
+    `
+    // appendChild
+    $("#status").append(alertHTML)
+}
+
+function modifyTaskAlert(threadID, isRunning, isError) {
+    try {
+        if (!isRunning) {
+            //add close button
+            closeButton = `
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span> 
+            </button>
+            `
+            $(`#${threadID}`).append(closeButton)
+            //if task finished successfully
+            if (!isError) {
+                $(`#${threadID}`).removeClass("alert-info").addClass("alert-success")
+                $(`#${threadID}-heading`).html("Email sent successfully")
+            }
+            //if task finished with an error
+            else {
+                $(`#${threadID}`).removeClass("alert-info").addClass("alert-danger")
+                $(`#${threadID}-heading`).html("Sorry, something went wrong")
+            }            
+        }
+    }
+    catch (err) {
+        console.log(err)
+    }
+}
+
+async function periodicStatusCheck(statusURL="", threadID="") {
     let isActive = false
     await fetch(statusURL)
             .then(res => res.json())
             .then(res => {
                 let isRunning = res["task_status"]["isRunning"]
                 let isError = res["task_status"]["isError"]
-                statusDiv.innerHTML = `isRunning: ${isRunning}, isError: ${isError}`
-                
+
+                modifyTaskAlert(threadID, isRunning, isError)
+
                 if (isRunning && !isError) {
                     isActive = true
                 }
@@ -22,56 +69,7 @@ async function periodicStatusCheck(statusURL="") {
             .catch(err => console.log(err))
 
     if (isActive){
-        setTimeout(() => periodicStatusCheck(statusURL), 2000)
+        setTimeout(() => periodicStatusCheck(statusURL, threadID), 2000)
     }
 }
 
-function TO_BE_DELETED_getStatus(statusURL) {
-    fetch(statusURL)
-    .then(res => res.json())
-    .then(res => {
-        document.getElementById("status").innerHTML = "ardy"//JSON.stringify(res)
-    })
-    .then(() => {
-        setTimeout(() => getStatus(statusURL), 1000)
-        console.log("hellow?")
-    })
-    .catch(err => console.log(err))
-}
-
-function TO_BE_DELETED_onFormSubmit() {
-    let playstoreID = document.getElementById("playstore_id")
-    let countryID = document.getElementById("country_code")
-    let email = document.getElementById("user_email")
-
-    fetch("/scrape", {
-        method: "POST",
-        headers: {
-            "Content-type": "application/json"
-        },
-        body: JSON.stringify({
-            "playstore_id": playstoreID.value,
-            "country_code": countryID.value,
-            "user_email": email.value
-        })
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res["status"] == 202) {
-            playstoreID.value = ""
-            countryID.value = ""
-            email.value = ""
-            return res
-        }
-        throw Error
-    })
-    .then(res => getStatus(res["url"]))
-    .catch(err => console.log(err))
-}
-
-// DEBUG
-document.getElementById("playstore_id").value = "in.goodapps.besuccessful"
-document.getElementById("country_code").value = "US"
-document.getElementById("user_email").value = "afharoen@gmail.com"
-
-periodicStatusCheck()

@@ -2,6 +2,12 @@
 {% block status_checker %}
 <!-- Starts a function call when thread starts -->
 <script>
-    periodicStatusCheck("{{ status_url }}")
+    initRenderTaskAlert(
+        threadID = "{{ thread_id }}", 
+        playstoreID = "{{ playstore_id }}", 
+        countryCode = "{{ country_code }}", 
+        userEmail = "{{ user_email }}",
+        )
+    periodicStatusCheck(statusURL="{{ status_url }}", threadID="{{ thread_id }}")
 </script>
 {% endblock status_checker %}
