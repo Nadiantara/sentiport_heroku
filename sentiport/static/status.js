@@ -17,7 +17,7 @@ function initRenderTaskAlert(
         <h4 id="${threadID}-heading" class="alert-heading">Working on it..</h4>
         <hr>
         <div class="mb-0">
-            <span id="${threadID}-desc">Sending</span> <strong>${playstoreID}</strong> <strong>${countryCode}</strong> report to <strong>${userEmail}</strong>
+            <span id="${threadID}-desc">Sending</span> <strong>${playstoreID}</strong> <strong>(${countryCode})</strong> report to <strong>${userEmail}</strong>
         </div>
     </div>
     `

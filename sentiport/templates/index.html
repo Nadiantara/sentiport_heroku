@@ -28,25 +28,17 @@
         <h1>Sentiport</h1>
         <form method="POST" action="{{url_for('scrape')}}">
             {{ form.hidden_tag() }}
-            <div class="form-group w-50">
+            <div id="playstore-id-query" class="form-group w-50">
                 <!-- form.app_id.label -->
                 <a class="my-0 py-0">Playstore URL</a>
-                {{ form.app_id(class="form-control") }}
+                {{ form.app_id(class="form-control", placeholder="https://play.google.com/store/apps/details?id=com.whatsapp") }}
                 {% for error in form.app_id.errors %}
                 <span class="text-danger">{{ error }}</span>
                 {% endfor %}
             </div>
-            <div class="form-group w-50">
-                <!-- form.app_id.label-->
-                <a class="my-0 py-0">Your Email</a>
-                {{ form.email(class="form-control") }}
-                {% for error in form.email.errors %}
-                <span class="text-danger">{{ error }}</span>
-                {% endfor %}
-            </div>
-            <div class="form-group w-50">
-                <a class="my-0 py-0">Country</a>
-                <select name="country_code" id="country_code" required="required" style="width:200px">
+            <div id="country-code-query" class="form-group w-50">
+                <a class="my-0 py-0">Review Origin</a>
+                <select name="country_code" id="country_code" class="form-control" required="required">
                     <option value="US" label="Select country ...  " selected="selected">United States (default) </option>
                     <optgroup id="country-optgroup-Africa" label="English Majority speaking countries">
                         <option value="US" label="United States">United States</option>
@@ -61,6 +53,14 @@
                         <option value="ZA" label="South Africa">South Africa</option>
                     </optgroup>
                 </select>
+            </div>
+            <div id="email-query" class="form-group w-50">
+                <!-- form.app_id.label-->
+                <a class="my-0 py-0">Your Email</a>
+                {{ form.email(class="form-control", placeholder="me@website.com") }}
+                {% for error in form.email.errors %}
+                <span class="text-danger">{{ error }}</span>
+                {% endfor %}
             </div>
             <div class="form-group"></div>
             <button type="submit" class="btn btn-outline-info">Submit</button>

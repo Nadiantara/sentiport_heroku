@@ -10,8 +10,6 @@ from tqdm import tqdm
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
 
-# @title Google Playstore Crawling Function as "get_crawl_google(id, country_id)"
-
 
 def get_crawl_google(id, country_id):
 

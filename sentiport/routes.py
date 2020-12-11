@@ -118,57 +118,57 @@ def pipeline(playstore_id, country, targetmail, thread_id):
         # crawling
         DATAFRAME = get_crawl_google(playstore_id, country)
 
-        # with thread_lock:
-        #     filename = create_pdf(DATAFRAME, playstore_id, country, thread_id)
+        with thread_lock:
+            filename = create_pdf(DATAFRAME, playstore_id, country, thread_id)
 
-        # uname_targetmail, domain_targetmail = get_user_mail(targetmail)
+        uname_targetmail, domain_targetmail = get_user_mail(targetmail)
 
-        # """SEND THE REPORT THROUGH EMAIL"""
-        # # Account used to send report
-        # email_address = environ.get('ST_EMAIL')
-        # print("my email: " + email_address)
-        # email_password = environ.get('ST_PASSWORD')
+        """SEND THE REPORT THROUGH EMAIL"""
+        # Account used to send report
+        email_address = environ.get('ST_EMAIL')
+        print("my email: " + email_address)
+        email_password = environ.get('ST_PASSWORD')
 
-        # # targeted email
-        # to_address = (
-        #     Address(
-        #         username=uname_targetmail,
-        #         domain=domain_targetmail
-        #     ),
-        # )
+        # targeted email
+        to_address = (
+            Address(
+                username=uname_targetmail,
+                domain=domain_targetmail
+            ),
+        )
 
-        # # body message
-        # with open("sentiport/templates/mail.html", "r", encoding='utf-8') as f:
-        #     HTML_MESSAGE = f.read()
+        # body message
+        with open("sentiport/templates/mail.html", "r", encoding='utf-8') as f:
+            HTML_MESSAGE = f.read()
 
-        # msg = create_email_message(
-        #     from_address=email_address,
-        #     to_address=to_address,
-        #     subject=f'{playstore_id} Review Analysis Report',
-        #     plaintext="Plain text version.",
-        #     html=HTML_MESSAGE
-        # )
+        msg = create_email_message(
+            from_address=email_address,
+            to_address=to_address,
+            subject=f'{playstore_id} Review Analysis Report',
+            plaintext="Plain text version.",
+            html=HTML_MESSAGE
+        )
 
-        # p = MIMEBase('application', 'octet-stream')
+        p = MIMEBase('application', 'octet-stream')
 
-        # # attaching the report into email
-        # with open(f"{temp_path}/{filename}", "rb") as attachment:
-        #     p.set_payload(attachment.read())
+        # attaching the report into email
+        with open(f"{temp_path}/{filename}", "rb") as attachment:
+            p.set_payload(attachment.read())
 
-        # encoders.encode_base64(p)
+        encoders.encode_base64(p)
 
-        # p.add_header('Content-Disposition',
-        #              "attachment; filename= %s" % filename)
+        p.add_header('Content-Disposition',
+                     "attachment; filename= %s" % filename)
 
-        # msg.attach(p)
+        msg.attach(p)
 
-        # with smtplib.SMTP('smtp.gmail.com', port=587) as smtp_server:
-        #     smtp_server.ehlo()
-        #     smtp_server.starttls()
-        #     smtp_server.login(email_address, email_password)
-        #     smtp_server.send_message(msg)
+        with smtplib.SMTP('smtp.gmail.com', port=587) as smtp_server:
+            smtp_server.ehlo()
+            smtp_server.starttls()
+            smtp_server.login(email_address, email_password)
+            smtp_server.send_message(msg)
 
-        # print('Email sent successfully')
+        print('Email sent successfully')
 
         threads[thread_id]["is_running"] = False
         threads[thread_id]["is_error"] = False
