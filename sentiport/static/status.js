@@ -17,7 +17,7 @@ function initRenderTaskAlert(
         <h4 id="${threadID}-heading" class="alert-heading">Working on it..</h4>
         <hr>
         <div class="mb-0">
-            Sending <strong>${playstoreID}</strong> <strong>${countryCode}</strong> report to <strong>${userEmail}</strong>
+            <span id="${threadID}-desc">Sending</span> <strong>${playstoreID}</strong> <strong>${countryCode}</strong> report to <strong>${userEmail}</strong>
         </div>
     </div>
     `
@@ -38,12 +38,14 @@ function modifyTaskAlert(threadID, isRunning, isError) {
             //if task finished successfully
             if (!isError) {
                 $(`#${threadID}`).removeClass("alert-info").addClass("alert-success")
-                $(`#${threadID}-heading`).html("Email sent successfully")
+                $(`#${threadID}-heading`).html("Email sent")
+                $(`#${threadID}-desc`).html("Successfully sent")
             }
             //if task finished with an error
             else {
                 $(`#${threadID}`).removeClass("alert-info").addClass("alert-danger")
                 $(`#${threadID}-heading`).html("Sorry, something went wrong")
+                $(`#${threadID}-desc`).html("Failed to send")
             }            
         }
     }
@@ -52,7 +54,7 @@ function modifyTaskAlert(threadID, isRunning, isError) {
     }
 }
 
-async function periodicStatusCheck(statusURL="", threadID="") {
+async function periodicStatusCheck(statusURL, threadID) {
     let isActive = false
     await fetch(statusURL)
             .then(res => res.json())
