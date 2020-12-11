@@ -220,7 +220,7 @@ def plot_total_language1(DATAFRAME, temp_dir):
 
     obj.savefig(f'sentiport/artifacts/{temp_dir}/fig_lang.png')
 
-    return 'fig_lang.png', most_lang
+    return f'sentiport/artifacts/{temp_dir}/fig_lang.png', most_lang
 
 
 def plot_detect_language2(DATAFRAME, temp_dir):
@@ -289,4 +289,4 @@ def plot_detect_language2(DATAFRAME, temp_dir):
 
     obj.savefig(f'sentiport/artifacts/{temp_dir}/fig_lang.png')
 
-    return 'fig_lang.png', most_lang
+    return f'sentiport/artifacts/{temp_dir}/fig_lang.png', most_lang

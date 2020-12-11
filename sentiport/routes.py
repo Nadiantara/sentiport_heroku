@@ -1,3 +1,5 @@
+import re
+import requests
 from email.headerregistry import Address
 import smtplib
 from email.mime.base import MIMEBase
@@ -11,14 +13,21 @@ from flask.helpers import make_response
 from sentiport.utils.utilities.crawling import *
 from sentiport.pdf_generator import create_pdf
 from sentiport.mail import create_email_message, get_user_mail
+from sentiport.forms import AppForm
 from sentiport import app, thread_lock, threads
-from flask import render_template, url_for, redirect, request, make_response, flash
+from flask import render_template, url_for, flash, redirect, request, abort, session
 from uuid import uuid1
 
 
-@app.route("/", methods=['GET'])
+#Error handler
+@app.errorhandler(404)
+def not_found_error(error):
+    return render_template('404.html'), 404
+
+@app.route("/", methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+    form = AppForm()
+    return render_template('index.html', form=form)
 
 
 @app.route("/status/<thread_id>", methods=['GET'])
@@ -42,41 +51,62 @@ def status(thread_id):
 
 @app.route("/scrape", methods=['GET', 'POST'])
 def scrape():
-    if request.method == 'POST':
-        # get form data
-        playstore_id = request.form['playstore_id']
-        country_code = request.form['country_code']
-        user_email = request.form['user_email']
-
-        thread_id = str(uuid1())
-        thread = Thread(
-            target=pipeline,
-            args=(
-                playstore_id,
-                country_code,
-                user_email,
-                thread_id
+    form = AppForm()
+    if form.validate_on_submit():
+        # get some data
+        APP_URL = form.app_id.data
+        COUNTRY = request.form['country_code']
+        targetmail = form.email.data
+        try:
+            url_res = requests.get(APP_URL)
+            PLAYSTORE_ID = get_id(APP_URL)
+        except:
+            abort(404)
+    
+        # start thread
+        if url_res.status_code == 200:
+            thread_id = str(uuid1())
+            thread = Thread(
+                target=pipeline,
+                args=(
+                    PLAYSTORE_ID,
+                    COUNTRY,
+                    targetmail,
+                    thread_id
+                )
             )
-        )
-        thread.start()
-        threads[thread_id] = {
-            "thread": thread,
-            "is_running": True,
-            "is_error": False,
-            "error_message": ""
-        }
+            thread.start()
+            threads[thread_id] = {
+                "thread": thread,
+                "is_running": True,
+                "is_error": False,
+                "error_message": ""
+            }
 
-        status_url = url_for("status", thread_id=thread_id)
-        response = make_response(render_template(
-            'status.html',
-            status_url = status_url,
-            thread_id = thread_id,
-            playstore_id = playstore_id,
-            country_code = country_code,
-            user_email = user_email,
-            ))
+            status_url = url_for("status", thread_id=thread_id)
+            response = make_response(render_template(
+                'status.html',
+                status_url = status_url,
+                thread_id = thread_id,
+                playstore_id = PLAYSTORE_ID,
+                country_code = COUNTRY,
+                user_email = targetmail,
+                form = form
+                ))
 
-        return response
+            return response
+
+        flash("""Wrong url or the application doesnt exist""", 'danger')
+        return redirect(url_for('index'))
+
+    flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
+    return redirect(url_for('index'))
+
+
+def get_id(toParse):
+    regex = r'\?id=([a-zA-Z\.]+)'
+    app_id = re.findall(regex, toParse)[0]
+    return app_id
 
 
 def pipeline(playstore_id, country, targetmail, thread_id):
@@ -149,4 +179,5 @@ def pipeline(playstore_id, country, targetmail, thread_id):
     
     finally:
         rmtree(temp_path)
+
 
