@@ -319,15 +319,13 @@ def plot_totalreview_sentiment(data, temp_dir):
 
 
 def plot_sentiment_time(data, temp_dir):
-    sentiment_summary = pd.DataFrame(
-        data['sentiment'].groupby(data['at']).value_counts())
-    sentiment_summary.rename(columns={'sentiment': 'total'}, inplace=True)
+    sentiment_summary = pd.DataFrame(data['sentiment'].groupby(data['at']).value_counts())
+    sentiment_summary.rename(columns={'sentiment':'total'}, inplace=True)
     sentiment_summary = sentiment_summary.reset_index()
 
-    pivot = pd.pivot_table(sentiment_summary, index='at',
-                           columns='sentiment', values='total')
+    pivot = pd.pivot_table(sentiment_summary, index = 'at', columns = 'sentiment', values = 'total')
     pivot = pivot.reset_index()
-    pivot = pivot.rename(columns={'sentiment': 'no'})
+    pivot = pivot.rename(columns={'sentiment':'no'})
 
     pivot['time'] = pivot['at'].dt.strftime("%b %Y")
 
@@ -357,7 +355,7 @@ def plot_sentiment_time(data, temp_dir):
     width = 0.35
 
     obj = plt.figure()
-    fig, ax = plt.subplots(figsize=(8.7084, 2.7394), dpi=100)
+    fig, ax = plt.subplots(figsize=(8.7084, 2.7394),dpi=100)
     obj = ax.bar(x - width, neg, width, label='Negative', color='#6d0000')
     obj = ax.bar(x, neu, width, label='Neutral', color='#8b6636')
     obj = ax.bar(x + width, pos, width, label='Positive', color='#1B290D')
