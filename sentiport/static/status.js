@@ -21,8 +21,8 @@ function initRenderTaskAlert(
         </div>
     </div>
     `
-    // appendChild
-    $("#status").append(alertHTML)
+    $("#status").append(alertHTML) // appendChild
+    $("#submit-button").attr("disabled") // disable button 
 }
 
 function modifyTaskAlert(threadID, isRunning, isError) {
@@ -35,6 +35,8 @@ function modifyTaskAlert(threadID, isRunning, isError) {
             </button>
             `
             $(`#${threadID}`).append(closeButton)
+            $("#submit-button").attr("disabled") // re-enable button
+            
             //if task finished successfully
             if (!isError) {
                 $(`#${threadID}`).removeClass("alert-info").addClass("alert-success")
