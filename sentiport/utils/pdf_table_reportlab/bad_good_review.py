@@ -233,6 +233,8 @@ def get_top5_good_review(DATAFRAME):
 
 
 def add_enter(dataframe, row_number):
+    max_number = -1
+    max_enter = -1
     if row_number == 0:
         max_number = 82
         max_enter = 4

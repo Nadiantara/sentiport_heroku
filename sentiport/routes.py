@@ -19,10 +19,11 @@ from flask import render_template, url_for, flash, redirect, request, abort, ses
 from uuid import uuid1
 
 
-#Error handler
+# Error handler
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
+
 
 @app.route("/", methods=['GET', 'POST'])
 def index():
@@ -34,14 +35,14 @@ def index():
 def status(thread_id):
     try:
         return {
-            "status": 200, 
-            "thread_id": thread_id, 
+            "status": 200,
+            "thread_id": thread_id,
             "task_status": {
-                "isRunning": threads[thread_id]["is_running"], 
+                "isRunning": threads[thread_id]["is_running"],
                 "isError": threads[thread_id]["is_error"],
                 "errorMessage": threads[thread_id]["error_message"]
-                }
             }
+        }
     except Exception as e:
         return {
             "status": 500,
@@ -62,7 +63,7 @@ def scrape():
             PLAYSTORE_ID = get_id(APP_URL)
         except:
             abort(404)
-    
+
         # start thread
         if url_res.status_code == 200:
             thread_id = str(uuid1())
@@ -86,13 +87,13 @@ def scrape():
             status_url = url_for("status", thread_id=thread_id)
             response = make_response(render_template(
                 'status.html',
-                status_url = status_url,
-                thread_id = thread_id,
-                playstore_id = PLAYSTORE_ID,
-                country_code = COUNTRY,
-                user_email = targetmail,
-                form = form
-                ))
+                status_url=status_url,
+                thread_id=thread_id,
+                playstore_id=PLAYSTORE_ID,
+                country_code=COUNTRY,
+                user_email=targetmail,
+                form=form
+            ))
 
             return response
 
@@ -171,13 +172,11 @@ def pipeline(playstore_id, country, targetmail, thread_id):
 
         threads[thread_id]["is_running"] = False
         threads[thread_id]["is_error"] = False
-        
+
     except Exception as e:
         threads[thread_id]["is_running"] = False
         threads[thread_id]["is_error"] = True
         threads[thread_id]["error_message"] = str(e)
-    
+
     finally:
         rmtree(temp_path)
-
-

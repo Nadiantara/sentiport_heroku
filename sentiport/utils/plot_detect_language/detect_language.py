@@ -139,9 +139,9 @@ def get_total_language(DATAFRAME):
 
 
 def f(t):
-    s1 = cos(2 * pi * t)
-    e1 = exp(-t)
-    return multiply(s1, e1)
+    s1 = np.cos(2 * np.pi * t)
+    e1 = np.exp(-t)
+    return np.multiply(s1, e1)
 
 
 def plot_total_language(DATAFRAME):

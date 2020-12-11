@@ -13,7 +13,9 @@ class AppForm(FlaskForm):
     app_id = StringField('App id', validators=[DataRequired(), URL()])
     email = StringField('Email', validators=[DataRequired(), Email()])
 
-#not being used
+# not being used
+
+
 def _guess_store(appid):
     """
     Return either 'AppStore' or 'PlayStore' based on the string pattern
@@ -27,7 +29,7 @@ def _guess_store(appid):
         return None
 
 
-#not being used
+# not being used
 # def validate_appid(appid: str, country: str):
 #     store = _guess_store(appid)
 #     assert store in ["AppStore", "PlayStore"]

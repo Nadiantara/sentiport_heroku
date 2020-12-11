@@ -30,12 +30,12 @@ def plot_overall_rating(dataframe, temp_dir):
 
     Parameters:
     dataframe-- data from get_crawl_data (but we can put data from apple scrapper if the columns names are identical)
-    
+
     returns:
     plot
     '''
-    #Overal Rating Chart
-    #Preprocessing
+    # Overal Rating Chart
+    # Preprocessing
     df = dataframe
     grouped_multiple = df.groupby(['rating']).agg({'review': ['count']})
     grouped_multiple.columns = ['review']
@@ -76,19 +76,19 @@ def plot_overall_rating(dataframe, temp_dir):
     sub1 = plt.subplot(111)
     ax = sns.barplot(value, bars, palette='mycolormap')
 
-    #Create names on the y-axis
-    #plt.yticks(bars)
+    # Create names on the y-axis
+    # plt.yticks(bars)
     plt.title("Rating", fontproperties=fontprop)
     plt.ylabel(None)
     plt.yticks(fontsize=15)
     plt.xticks(fontsize=10)
-    #Hiding xaxes
+    # Hiding xaxes
     ax = plt.gca()
     ax.axes.xaxis.set_visible(False)
-    #Putting value on top of bar
+    # Putting value on top of bar
 
     for index, value in enumerate(value):
-      plt.text(value + 2, index + 0.15, str(value) + '%', fontsize=15)
+        plt.text(value + 2, index + 0.15, str(value) + '%', fontsize=15)
 
     sns.despine(left=True, bottom=True, right=True, top=True)
     plt.grid(False)

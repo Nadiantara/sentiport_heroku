@@ -43,13 +43,15 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     # scrapping current total review
     current_review = value_total_review(PLAYSTORE_ID)
     end = time.time()
-    print(f"Total Review scrapping done! \n processing time: {(end-start)} sec")
+    print(
+        f"Total Review scrapping done! \n processing time: {(end-start)} sec")
 
     start = time.time()
     # scrapping current rating
     company_logo = image_company_logo(PLAYSTORE_ID, temp_dir)
     end = time.time()
-    print(f"Company logo scrapping done! \n processing time: {(end-start)} sec")
+    print(
+        f"Company logo scrapping done! \n processing time: {(end-start)} sec")
 
     start = time.time()
     # call detect language plot and most language value
@@ -114,7 +116,6 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     # get the full app title (ex: Halodoc - Doctors, Medicine, & Appiontments)
     app_title_name = app_title(PLAYSTORE_ID, COUNTRY)
 
-
     # cut the name into short name (ex: Halodoc)
     if "-" in app_title_name:
         app_name = []
@@ -135,7 +136,6 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
         app_name = app_title_name.split()
         app_name = app_name[0]
 
-
     # create the report filename using app name
     fileName = app_name+'_review_analysis.pdf'
 
@@ -143,7 +143,8 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     documentTitle = app_title_name
 
     # define canvas to create the report
-    pdf = canvas.Canvas(f"sentiport/artifacts/{temp_dir}/{fileName}", pagesize=(1366, 768))
+    pdf = canvas.Canvas(
+        f"sentiport/artifacts/{temp_dir}/{fileName}", pagesize=(1366, 768))
 
     # get today's date
     today = date.today()
@@ -244,7 +245,8 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawString(268, 768-285, f": {hari_ini}")
 
     # set size and position of total rating plot
-    pdf.drawInlineImage(fig_overall_rating, 921, 768-635, width=378, height=293)
+    pdf.drawInlineImage(fig_overall_rating, 921, 768 -
+                        635, width=378, height=293)
 
     # set font, size, and position of current rating and total review
     pdf.setFont("Helvetica-Bold", 54)
