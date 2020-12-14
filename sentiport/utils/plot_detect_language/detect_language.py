@@ -194,7 +194,7 @@ def plot_total_language1(DATAFRAME, temp_dir):
     # plt.subplot(title='Number of Reviews by Language')
 
     plt.grid(b=None)
-    sub1 = subplot(111)
+    #sub1 = subplot(111)
     ax = sns.barplot(x='review', y='Language', data=lang, palette='mycolormap')
 
     total = lang['review'].sum()

@@ -343,9 +343,10 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.drawString(
         935, 768-500, f"\t Most of the Review Sentiment is {most_sentiment}")
     pdf.drawString(
-        935, 768-545, f"\t ver. {MostPos_Version} has the highest positive review")
+        935, 768-545, f"\t {MostPos_Version} has the highest positive review")
     pdf.drawString(
-        935, 768-590, f"\t ver. {MostNeg_Version} has the highest negative review")
+        935, 768-590, f"\t {MostNeg_Version} has the highest negative review")
+
 
     # set font, size, and position of footer
     pdf.setFont("Helvetica-Bold", 20)
