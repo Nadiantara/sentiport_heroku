@@ -393,9 +393,8 @@ def tag_words_np(dataframe, row_number):
           i += 1
       txt = txt.replace('NP', j)
 
-  dataframe.iloc[row_number, dataframe.columns.get_loc(
-      'original_review')] = txt
-  return dataframe
+    dataframe.iloc[row_number, dataframe.columns.get_loc('original_review')] = txt
+    return dataframe
 
 
 def transform_bad_review(bad_review):
