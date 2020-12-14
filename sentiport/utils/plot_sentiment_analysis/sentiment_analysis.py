@@ -21,11 +21,11 @@ fontprop_label = fm.FontProperties(fname=path_label, size=12)
 
 
 def translate_dataframe(DATAFRAME):
-  try:
-    translator = Translator()
-    return translator.translate(DATAFRAME).text
-  except:
-    return None
+    try:
+        translator = Translator()
+        return translator.translate(DATAFRAME).text
+    except:
+        return None
 
 
 def polarity_calc(text):
@@ -43,84 +43,84 @@ def subjectivity_calc(text):
 
 
 def preprocessing_weeks(TRANSLATED_DATAFRAME):
-  TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
+    TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
 
-  week_number = []
-  for i in range(len(TRANSLATED_DATAFRAME)):
-      week_number.append(TRANSLATED_DATAFRAME['time'][i].week)
+    week_number = []
+    for i in range(len(TRANSLATED_DATAFRAME)):
+        week_number.append(TRANSLATED_DATAFRAME['time'][i].week)
 
-  TRANSLATED_DATAFRAME['week_number'] = pd.DataFrame(week_number)
+    TRANSLATED_DATAFRAME['week_number'] = pd.DataFrame(week_number)
 
-  week_list = []
-  for i in TRANSLATED_DATAFRAME['week_number']:
-    week_list.append('Week ' + str(i))
+    week_list = []
+    for i in TRANSLATED_DATAFRAME['week_number']:
+        week_list.append('Week ' + str(i))
 
-  TRANSLATED_DATAFRAME['time'] = week_list
-  TRANSLATED_DATAFRAME.drop('week_number', axis=1, inplace=True)
+    TRANSLATED_DATAFRAME['time'] = week_list
+    TRANSLATED_DATAFRAME.drop('week_number', axis=1, inplace=True)
 
-  if "Unnamed: 0" in TRANSLATED_DATAFRAME.columns:
-    TRANSLATED_DATAFRAME.drop('Unnamed: 0', axis=1, inplace=True)
+    if "Unnamed: 0" in TRANSLATED_DATAFRAME.columns:
+        TRANSLATED_DATAFRAME.drop('Unnamed: 0', axis=1, inplace=True)
 
-  if "Unnamed: 0.1" in TRANSLATED_DATAFRAME.columns:
-    TRANSLATED_DATAFRAME.drop('Unnamed: 0.1', axis=1, inplace=True)
+    if "Unnamed: 0.1" in TRANSLATED_DATAFRAME.columns:
+        TRANSLATED_DATAFRAME.drop('Unnamed: 0.1', axis=1, inplace=True)
 
-  return TRANSLATED_DATAFRAME
+    return TRANSLATED_DATAFRAME
 
 
 def get_translated_dataframe(DATAFRAME):
-  TRANSLATED_REVIEW = DATAFRAME['review'].apply(translate_dataframe)
-  TRANSLATED_REVIEW = pd.DataFrame(TRANSLATED_REVIEW)
-  TRANSLATED_REVIEW['version'] = DATAFRAME['version']
-  TRANSLATED_REVIEW['rating'] = DATAFRAME['rating']
-  TRANSLATED_REVIEW['time'] = DATAFRAME['at']
-  return TRANSLATED_REVIEW
+    TRANSLATED_REVIEW = DATAFRAME['review'].apply(translate_dataframe)
+    TRANSLATED_REVIEW = pd.DataFrame(TRANSLATED_REVIEW)
+    TRANSLATED_REVIEW['version'] = DATAFRAME['version']
+    TRANSLATED_REVIEW['rating'] = DATAFRAME['rating']
+    TRANSLATED_REVIEW['time'] = DATAFRAME['at']
+    return TRANSLATED_REVIEW
 
 
 def get_sentiment_dataframe(TRANSLATED_DATAFRAME):
-  # USE THIS LINE IF YOU WANNA SKIP TRANSLATION
-  TRANSLATED_DATAFRAME['version'] = TRANSLATED_DATAFRAME['version']
-  TRANSLATED_DATAFRAME['rating'] = TRANSLATED_DATAFRAME['rating']
-  TRANSLATED_DATAFRAME['time'] = TRANSLATED_DATAFRAME['at']
+    # USE THIS LINE IF YOU WANNA SKIP TRANSLATION
+    TRANSLATED_DATAFRAME['version'] = TRANSLATED_DATAFRAME['version']
+    TRANSLATED_DATAFRAME['rating'] = TRANSLATED_DATAFRAME['rating']
+    TRANSLATED_DATAFRAME['time'] = TRANSLATED_DATAFRAME['at']
 
-  # USE THIS AND SKIP ABOVE IF YOU WANNA USE TRANSLATION
-  TRANSLATED_DATAFRAME['polarity'] = TRANSLATED_DATAFRAME['review'].apply(
-      polarity_calc)
-  TRANSLATED_DATAFRAME['subjectivity'] = TRANSLATED_DATAFRAME['review'].apply(
-      subjectivity_calc)
+    # USE THIS AND SKIP ABOVE IF YOU WANNA USE TRANSLATION
+    TRANSLATED_DATAFRAME['polarity'] = TRANSLATED_DATAFRAME['review'].apply(
+        polarity_calc)
+    TRANSLATED_DATAFRAME['subjectivity'] = TRANSLATED_DATAFRAME['review'].apply(
+        subjectivity_calc)
 
-  TRANSLATED_DATAFRAME['sentiment'] = np.nan
+    TRANSLATED_DATAFRAME['sentiment'] = np.nan
 
-  for i in range(len(TRANSLATED_DATAFRAME)):
-    if TRANSLATED_DATAFRAME.polarity[i] > 0:
-      # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Positive'
-      TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
-          'sentiment')] = 'Positive'
-    elif TRANSLATED_DATAFRAME.polarity[i] == 0:
-      # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Neutral'
-      TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
-          'sentiment')] = 'Neutral'
-    elif TRANSLATED_DATAFRAME.polarity[i] < 0:
-      # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Negative'
-      TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
-          'sentiment')] = 'Negative'
+    for i in range(len(TRANSLATED_DATAFRAME)):
+        if TRANSLATED_DATAFRAME.polarity[i] > 0:
+            # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Positive'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Positive'
+        elif TRANSLATED_DATAFRAME.polarity[i] == 0:
+            # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Neutral'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Neutral'
+        elif TRANSLATED_DATAFRAME.polarity[i] < 0:
+            # TRANSLATED_DATAFRAME['sentiment'].iloc[i] = 'Negative'
+            TRANSLATED_DATAFRAME.iloc[i, TRANSLATED_DATAFRAME.columns.get_loc(
+                'sentiment')] = 'Negative'
 
-  TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
-  TRANSLATED_DATAFRAME['time'] = TRANSLATED_DATAFRAME['time'].dt.strftime(
-      '%Y-%m-%d')
-  TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
+    TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
+    TRANSLATED_DATAFRAME['time'] = TRANSLATED_DATAFRAME['time'].dt.strftime(
+        '%Y-%m-%d')
+    TRANSLATED_DATAFRAME['time'] = pd.to_datetime(TRANSLATED_DATAFRAME['time'])
 
-  # Checking if time is more than 3 months
-  check_month = TRANSLATED_DATAFRAME.copy()
-  check_month['time'] = check_month['time'].dt.strftime('%b %Y')
-  check_month['at'] = pd.to_datetime(check_month['time'])
-  months = check_month['time'].nunique()
+    # Checking if time is more than 3 months
+    check_month = TRANSLATED_DATAFRAME.copy()
+    check_month['time'] = check_month['time'].dt.strftime('%b %Y')
+    check_month['at'] = pd.to_datetime(check_month['time'])
+    months = check_month['time'].nunique()
 
-  if months >= 3:
-    return check_month
-  else:
-    print("Data less than 3  mos")
-    TRANSLATED_DATAFRAME = preprocessing_weeks(TRANSLATED_DATAFRAME)
-    return TRANSLATED_DATAFRAME
+    if months >= 3:
+        return check_month
+    else:
+        print("Data less than 3  mos")
+        TRANSLATED_DATAFRAME = preprocessing_weeks(TRANSLATED_DATAFRAME)
+        return TRANSLATED_DATAFRAME
 
 
 def plot_totalreview_time(data, temp_dir):
@@ -133,10 +133,10 @@ def plot_totalreview_time(data, temp_dir):
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "", ["#bba68a", "#957347", "#8b6636"])
 
-    #Plot graph with 2 y axes
+    # Plot graph with 2 y axes
     fig, ax1 = plt.subplots(figsize=(11.8726, 4.9648), dpi=100)
 
-    #Plot bars
+    # Plot bars
     ax1.bar(review_by_time['time'], review_by_time['review'], color=cmap(
         review_by_time['review'].values/review_by_time['review'].values.max()))
 
@@ -144,9 +144,9 @@ def plot_totalreview_time(data, temp_dir):
     ax1.set_ylabel('Total Review', color="#8b6636",
                    fontproperties=fontprop_label)
 
-    #Set up ax2 to be the second y axis with x shared
+    # Set up ax2 to be the second y axis with x shared
     ax2 = ax1.twinx()
-    #Plot a line
+    # Plot a line
     ax2.plot(review_by_time['time'], review_by_time['rating'],
              marker='o', linestyle='dashed', color="#6d0000")
     # Make the y-axis label and tick labels match the line color.
@@ -193,17 +193,18 @@ def plot_totalreview_version(data, temp_dir):
     percent = []
 
     for i in range(len(review_by_version)):
-      persen = review_by_version['review'][i]/sum(review_by_version['review'])
-      percent.insert(i, persen)
+        persen = review_by_version['review'][i] / \
+            sum(review_by_version['review'])
+        percent.insert(i, persen)
 
     review_by_version['percent'] = percent
     value = 0
     panjang_data = []
 
     for i in reversed(review_by_version.index):
-      value = value + review_by_version['percent'][i]
-      if value < 0.9:
-        panjang_data.append(i)
+        value = value + review_by_version['percent'][i]
+        if value < 0.9:
+            panjang_data.append(i)
 
     review_by_version = review_by_version[-len(panjang_data):]
     review_by_version.reset_index(inplace=True)
@@ -211,10 +212,10 @@ def plot_totalreview_version(data, temp_dir):
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "", ["#aa6a6a", "#791515", "#6d0000"])
 
-    #Plot graph with 2 y axes
+    # Plot graph with 2 y axes
     fig, ax1 = plt.subplots(figsize=(11.8726, 4.9648), dpi=100)
 
-    #Plot bars
+    # Plot bars
     ax1.bar(review_by_version['version'], review_by_version['review'], color=cmap(
         review_by_version['review'].values/review_by_version['review'].values.max()))
     ax1.set_xticklabels(review_by_version['version'], rotation=90)
@@ -223,9 +224,9 @@ def plot_totalreview_version(data, temp_dir):
     ax1.set_ylabel('Total Review', color="#6d0000",
                    fontproperties=fontprop_label)
 
-    #Set up ax2 to be the second y axis with x shared
+    # Set up ax2 to be the second y axis with x shared
     ax2 = ax1.twinx()
-    #Plot a line
+    # Plot a line
     ax2.plot(review_by_version['version'], review_by_version['rating'],
              marker='o', markersize=5, linestyle='dashed', color="#8b6636")
     # Make the y-axis label and tick labels match the line color.
@@ -381,15 +382,15 @@ def plot_sentiment_version(data, temp_dir):
     sentiment_summary = sentiment_summary.reset_index()
     percent = []
     for i in range(len(sentiment_summary)):
-      persen = sentiment_summary['total'][i]/sum(sentiment_summary['total'])
-      percent.insert(i, persen)
+        persen = sentiment_summary['total'][i]/sum(sentiment_summary['total'])
+        percent.insert(i, persen)
     sentiment_summary['percent'] = percent
     value = 0
     panjang_data = []
     for i in reversed(sentiment_summary.index):
-      value = value + sentiment_summary['percent'][i]
-      if value < 0.9:
-        panjang_data.append(i)
+        value = value + sentiment_summary['percent'][i]
+        if value < 0.9:
+            panjang_data.append(i)
     sentiment_summary = sentiment_summary[-len(panjang_data):]
     sentiment_summary.reset_index(inplace=True)
 
