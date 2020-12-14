@@ -172,7 +172,7 @@ def top_bad_review(dataframe, bad_review):
     dataframe = dataframe.reset_index()
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
-    dataframe = remove_emoji(dataframe)
+    #dataframe = remove_emoji(dataframe)
 
     # bad_review = bad_review.rename(columns={'score':'score'})
     bad_review = pd.merge(bad_review, dataframe, on=[
@@ -209,7 +209,7 @@ def top_good_review(dataframe, good_review):
     dataframe = dataframe.reset_index()
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
-    dataframe = remove_emoji(dataframe)
+    #dataframe = remove_emoji(dataframe)
 
     # good_review = good_review.rename(columns={'score':'score'})
     good_review = pd.merge(good_review, dataframe, on=[
