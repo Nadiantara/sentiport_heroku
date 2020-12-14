@@ -14,7 +14,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from math import log
 import nltk
-nltk.download('brown')
+#nltk.download('brown')
 styleSheet = getSampleStyleSheet()
 translator = Translator()
 
@@ -131,27 +131,27 @@ def deEmojify(text):
     '''
     Remove emoji from review data
     '''
-    regrex_pattern = re.compile(pattern="["
-                                u"\U0001F600-\U0001F64F"  # emoticons
-                                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-                                u"\U0001F680-\U0001F6FF"  # transport & map symbols
-                                u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-                                u"\U00002702-\U000027B0"
-                                u"\U000024C2-\U0001F251"
-                                u"\U0001f926-\U0001f937"
-                                u"\U00010000-\U0010ffff"
-                                u"\u2640-\u2642"
-                                u"\u2600-\u2B55"
-                                u"\u200d"
-                                u"\u23cf"
-                                u"\u23e9"
-                                u"\u231a"
-                                u"\ufe0f"  # dingbats
-                                u"\u3030"
-                                "]+", flags=re.UNICODE)
-    text = regrex_pattern.sub(r'', text)
-    text = text.replace('\n', ' ')
-    text = re.sub(' +', ' ', text)
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"\u2640-\u2642" 
+        u"\u2600-\u2B55"
+        u"\u200d"
+        u"\u23cf"
+        u"\u23e9"
+        u"\u231a"
+        u"\ufe0f"  # dingbats
+        u"\u3030"
+        "]+", flags = re.UNICODE)
+    text=regrex_pattern.sub(r'',text)
+    text=text.replace('\n',' ')
+    text=re.sub(' +', ' ', text)
 
     return text
 
@@ -162,8 +162,11 @@ def remove_emoji(dataframe):
     '''
     print("Please wait, currently we're doing second preprocessing for your review data!")
     dataframe = dataframe.copy()
-    dataframe['original_review'] = dataframe['original_review'].apply(
-        deEmojify)  # removing emoji
+    try:
+        dataframe['original_review'] = dataframe['original_review'].apply(
+            deEmojify)  # removing emoji
+    except Exception as e:
+        pass
     return dataframe
 
 
@@ -172,7 +175,7 @@ def top_bad_review(dataframe, bad_review):
     dataframe = dataframe.reset_index()
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
-    #dataframe = remove_emoji(dataframe)
+    dataframe = remove_emoji(dataframe)
 
     # bad_review = bad_review.rename(columns={'score':'score'})
     bad_review = pd.merge(bad_review, dataframe, on=[
@@ -209,7 +212,7 @@ def top_good_review(dataframe, good_review):
     dataframe = dataframe.reset_index()
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
-    #dataframe = remove_emoji(dataframe)
+    dataframe = remove_emoji(dataframe)
 
     # good_review = good_review.rename(columns={'score':'score'})
     good_review = pd.merge(good_review, dataframe, on=[
