@@ -12,7 +12,7 @@ instance/
 .webassets-cache
 
 # Environments
-.env
+**.env
 .venv
 env/
 venv/
@@ -25,5 +25,4 @@ venv.bak/
 **.pdf
 **.png
 !sentiport/utils/assets/**
-
 .*

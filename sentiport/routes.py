@@ -9,13 +9,14 @@ from shutil import rmtree
 from threading import Thread
 import json
 from flask.helpers import make_response
+import redis
 # importing unit 4's functions
 from sentiport.utils.utilities.crawling import *
 from sentiport.pdf_generator import create_pdf
 from sentiport.mail import create_email_message, get_user_mail
 from sentiport.forms import AppForm
-from sentiport import app, thread_lock, threads
-from flask import render_template, url_for, flash, redirect, request, abort, session
+from sentiport import app, thread_lock, threads, store
+from flask import render_template, url_for, flash, redirect, request, abort, session, jsonify
 from uuid import uuid1
 
 
@@ -33,24 +34,45 @@ def index():
 
 @app.route("/status/<thread_id>", methods=['GET'])
 def status(thread_id):
+    # Common mistakes: passing byte got from redis into JSON response
     try:
-        return {
+        statuses = store.hmget(
+            thread_id,
+            "is_running",
+            "is_error",
+            "error_message"
+            )
+        is_running, is_error, error_message = [status.decode("utf-8") for status in statuses]
+        is_running = int(is_running); is_error = int(is_error)
+        return jsonify({
             "status": 200,
             "thread_id": thread_id,
             "task_status": {
-                "isRunning": threads[thread_id]["is_running"],
-                "isError": threads[thread_id]["is_error"],
-                "errorMessage": threads[thread_id]["error_message"]
+                "isRunning": is_running,
+                "isError": is_error,
+                "errorMessage": error_message,
             }
-        }
+        })
     except Exception as e:
         return {
             "status": 500,
             "error": str(e)
-        }
+        }        
 
 
-@app.route("/scrape", methods=['GET', 'POST'])
+@app.route("/status/delete", methods=['POST'])
+def delete_thread_status():
+    # Assumption: Most of the time, this method is called naturally by JavaScript,
+    # when thread has stopped running. Not called manually by user
+    try:
+        thread_id = request.json["thread_id"]
+        store.delete(thread_id)
+        return {"status": 200, "message": "thread status deleted"}
+    except Exception as e:
+        return {"status": 200, "error_message": str(e)}
+
+
+@app.route("/scrape", methods=['POST'])
 def scrape():
     form = AppForm()
     if form.validate_on_submit():
@@ -77,12 +99,13 @@ def scrape():
                 )
             )
             thread.start()
-            threads[thread_id] = {
-                "thread": thread,
-                "is_running": True,
-                "is_error": False,
+            
+            # store status to redis
+            store.hmset(thread_id, {
+                "is_running": int(True),
+                "is_error": int(False),
                 "error_message": ""
-            }
+            })
 
             status_url = url_for("status", thread_id=thread_id)
             response = make_response(render_template(
@@ -170,13 +193,19 @@ def pipeline(playstore_id, country, targetmail, thread_id):
 
         print('Email sent successfully')
 
-        threads[thread_id]["is_running"] = False
-        threads[thread_id]["is_error"] = False
+        # store status to redis
+        store.hmset(thread_id, {
+            "is_running": int(False),
+            "is_error": int(False)
+        })
 
     except Exception as e:
-        threads[thread_id]["is_running"] = False
-        threads[thread_id]["is_error"] = True
-        threads[thread_id]["error_message"] = str(e)
+        # store status to redis
+        store.hmset(thread_id, {
+            "is_running": int(False),
+            "is_error": int(True),
+            "error_message": str(e)
+        })
 
     finally:
         rmtree(temp_path)

@@ -72,8 +72,21 @@ async function periodicStatusCheck(statusURL, threadID) {
             }) 
             .catch(err => console.log(err))
 
-    if (isActive){
+    if (isActive)
+    {
         setTimeout(() => periodicStatusCheck(statusURL, threadID), 2000)
+    }
+    else {
+        await fetch("status/delete", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "thread_id": threadID
+            })
+        })
+        .catch(err => console.log(err))
     }
 }
 
