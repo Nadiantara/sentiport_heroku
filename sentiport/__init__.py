@@ -16,6 +16,6 @@ thread_lock = Lock()
 threads = {}
 
 # Redis key-val store
-store = redis.Redis(url=environ.get('REDISCLOUD_URL'))
+store = redis.from_url(environ.get('REDISCLOUD_URL'))
 
 from sentiport import routes
