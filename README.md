@@ -102,7 +102,7 @@ Root
   - `requirements.txt`: all library names that is being used in this web app
   - `screenshots`: folder that contains all screenshots that is being used in this documentation
   - `sentiport`: folder that contains routing and all functions that is being used for generating pdf report
-    - `forms.py`: contains Flas-WTForms configuration and set up
+    - `forms.py`: contains Flask-WTForms configuration and set up
     - `mail.py`: contains all functions that is being used to send the user an email after runing the program
     - `pdf_generator.py`: contains functions that could generate a pdf report with some specific inputs
     - `routes.py`: contains Flask routing set up
@@ -199,7 +199,7 @@ Root
     - `Buildpacks`:Buildpacks are scripts that are run when your app is deployed. They are used to install dependencies for your app and configure your environment. 
     - `SSL Certificates`: SSL Certificates provide end-to-end encryption and integrity for all web requests to ensure information is transmitted securely (does not available in free plan). 
     - `Domains`: You can add custom domains to any Heroku app, then visit Configuring DNS to setup your DNS target.
-    - `Transfer Ownership`: Transfer this app to your personal account or a team you are a member of. Learn more
+    - `Transfer Ownership`: Transfer this app to your personal account or a team you are a member of. 
     - `Maintenance Mode`: If you need to take your app offline you can turn on maintenance mode.
     - `Delete app`: Deleting your app and its add-ons is irreversible.
 
