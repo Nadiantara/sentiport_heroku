@@ -142,10 +142,12 @@ Root
   - [For Mac](https://docs.docker.com/docker-for-mac/install/)
 - Go to sentiport folder, open `__init.py__`
 - Make sure the redis configuration is this: `store = redis.Redis(host="redis", port=6379)` and delete the configuration that using `REDISCLOUD_URL` 
-- Build docker images
->  > -  `docker-compose build` (This will take some time)
-- Run the services
->  > -  `docker-compose up`
+- Build docker images and run the services
+> ```
+>     > `docker-compose build` (This will take some time)
+>     > `docker-compose up`
+> ```
+
   
 #### **2. Without Docker**
 - For Windows without WSL:
