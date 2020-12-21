@@ -173,11 +173,48 @@ Root
 #### **3. Deployment to Heroku**
 > **Heroku** is one of a cloud PaaS (platform as a service) provider
 ![Image](screenshots/ArchitectureHeroku.png)
-- [Create Heroku account](https://signup.heroku.com/)
+- [Create an Heroku account](https://signup.heroku.com/)
 - On your Heroku dashboard click `New` and then `create new app`
 > ![Image](screenshots/heroku_dashboard.png) 
 - Give your app a name and then click `create app`
-- After app has been created, we will redirected to `Deploy` menu on the dashboard
+- After the app has been created, we will redirected to `Deploy` menu on the dashboard
 - Skip the `Choose pipeline` option and proceed to deployment method
 - Choose deployment with `GitHub` for easier configuration
 > ![Image](screenshots/deployment_method.png)
+- Skip the `Automatic deploys` option and proceed to `Manual deploys` and choose a branch from your repo then click `deploy branch`
+- Wait for a momment, if your build success then there will be `view` button apear.
+- Click it and you will be redirected to your application.
+
+#### **More about Heroku Dashboard**
+- There are seven menus at Heroku Dashboard after an app has been created:
+  - `Overview`: Menu that contains overview of your app, build history, Heroku plans, etc.
+  - `Resources`: Menu that contains resources management; Dyno(s) and add-ons. Dynos are isolated, virtualized Linux containers that are designed to execute code based on a user-specified command. Basically number of dynos equals number of worker. Add-ons is an optional service that you could add to your application, for example this app wil use Redis cloud add-ons.
+  - `Deploy`: Menu that contains deployment options
+  - `Metric`: Menu that give you monitoring tools for your application (does not available in free plan)
+  - `Activity`: Menu that shows a more detailed deployment activities and history
+  - `Access`: Menu that contains access management to your app
+  - `Settings`: Menu that contains your app information and configuration
+    - `App Information`: Settings sub menu that contains a more detailed informations of your app
+    - `Config Vars`: Use this sub menu for your environment variable, so you dont need to push your .env file to your Github repo
+    - `Buildpacks`:Buildpacks are scripts that are run when your app is deployed. They are used to install dependencies for your app and configure your environment. 
+    - `SSL Certificates`: SSL Certificates provide end-to-end encryption and integrity for all web requests to ensure information is transmitted securely (does not available in free plan). 
+    - `Domains`: You can add custom domains to any Heroku app, then visit Configuring DNS to setup your DNS target.
+    - `Transfer Ownership`: Transfer this app to your personal account or a team you are a member of. Learn more
+    - `Maintenance Mode`: If you need to take your app offline you can turn on maintenance mode.
+    - `Delete app`: Deleting your app and its add-ons is irreversible.
+
+#### **Debugging Heroku Application**
+-[Install Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- Log in to Heroku via CLI
+> ```
+>     > heroku login
+> ```
+- Go to your local repository/root folder for the app
+- Add the repo to Heroku git repository
+> ```
+>     > git add remote https://git.heroku.com/<your app name>.git
+> ```
+- Check your most recent app logs 
+> ```
+>     > heroku --logs tail
+> ```
