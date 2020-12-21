@@ -226,7 +226,7 @@ def create_pdf(DATAFRAME, PLAYSTORE_ID, COUNTRY, temp_dir):
     pdf.showPage()
 
     # put the introduction template
-    pdf.drawInlineImage('sentiport/utils/assets/introduction.png',
+    pdf.drawInlineImage('sentiport/utils/assets/Introduction.png',
                         0, 0, width=1366, height=768)
 
     # put logo
