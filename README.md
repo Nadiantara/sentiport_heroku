@@ -144,8 +144,8 @@ Root
 - Make sure the redis configuration is this: `store = redis.Redis(host="redis", port=6379)` and delete the configuration that using `REDISCLOUD_URL` 
 - Build docker images and run the services
 > ```
->     > `docker-compose build` (This will take some time)
->     > `docker-compose up`
+>     > docker-compose build (This will take some time)
+>     > docker-compose up
 > ```
 
   
@@ -171,3 +171,13 @@ Root
   - Run the program using `flask run` on terminal
 
 #### **3. Deployment to Heroku**
+> **Heroku** is one of a cloud PaaS (platform as a service) provider
+![Image](screenshots/ArchitectureHeroku.png)
+- [Create Heroku account](https://signup.heroku.com/)
+- On your Heroku dashboard click `New` and then `create new app`
+> ![Image](screenshots/heroku_dashboard.png) 
+- Give your app a name and then click `create app`
+- After app has been created, we will redirected to `Deploy` menu on the dashboard
+- Skip the `Choose pipeline` option and proceed to deployment method
+- Choose deployment with `GitHub` for easier configuration
+> ![Image](screenshots/deployment_method.png)
