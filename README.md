@@ -6,7 +6,7 @@ Super-minimalistic app version of the Data Analysts' sentiment analysis automate
 
 ## **1. Project structure**
 ```
-sentiport(root)
+Root
 │   .env
 │   .gitignore
 │   app.py
@@ -90,6 +90,32 @@ sentiport(root)
                 crawling.py
                 helper.py
 ```
+### Folders and files glossary:
+  - `.env`: file that contains your environment variables, you must create your own .env file before runing this web app.
+  - .gitignore: file that contains all file names that should not pushed to the remote repository (e.g :cache files, files that is being generated after runing the program, files that contains sensitive information like .env)
+  - app.py: file that first being executed/called to run this program
+  - config.py: this file calls all environment variables from .env 
+  - docker-compose.yml: configuration for Docker Compose, images from all docker files are being 'set up' here
+  - Dockerfile: this file is used for generate an Docker image and the Docker container will run based on this image and the configuration that is being set up at docker-compose
+  - nltk.txt: we use this file for Heroku deployment. This file contains nltk's module that is being used in this web app.
+  - Procfile: Heroku files that contains Flask WSGI basic set up
+  - requirements.txt: all library names that is being used in this web app
+  - screenshots: folder that contains all screenshots that is being used in this documentation
+  - sentiport: folder 
+    - forms.py: contains Flas-WTForms configuration and set up
+    - mail.py: contains all functions that is being used to send the user an email after runing the program
+    - pdf_generator.py: contains functions that could generate a pdf report with some specific inputs
+    - routes.py: contains Flask routing set up
+    - __init__.py: contains this application's name, email, threading, and Redis setup
+    - artifacts: contains all temporary generated files (pictures and pdf(s))
+    - static: Javascript configuration for front-end view
+    - templates: contains html files that is being used in this web app
+    - utils: contains all utilities and function for generating pdf report. Most of functions are being called in pdf_generator.py
+      - assets: contains all image templates that is being used for generates pdf
+      - Helvetica-Font: contains all fonts styling
+      - pdf_table_reportlab, plot_detect_language, plot_rating, plot_sentiment_analysis, and utilities: contains helper functions for generating pdf report
+
+
 ## **2. How to Run**
 ### Running the project on local:
 #### **Before you run the commands**
@@ -109,12 +135,13 @@ sentiport(root)
     - [For Windows "Above" Home (Enterprise, Professional, etc.)](https://docs.docker.com/docker-for-windows/install/)
   - For Windows with WSL/WSL2(recommended for Windows):
     - [Follow this docs for WSL setup](https://docs.microsoft.com/en-us/windows/wsl/install-win10)
-    - [Follow this docs for WSL Docker installation] (https://docs.docker.com/docker-for-windows/wsl/)
+    - [Follow this docs for WSL Docker installation](https://docs.docker.com/docker-for-windows/wsl/)
   - For Linux
     - [Install Docker](https://docs.docker.com/engine/install/)
     - [Install Docker Compose](https://docs.docker.com/compose/install/)
   - [For Mac](https://docs.docker.com/docker-for-mac/install/)
-- Go to sentiport folder
+- Go to sentiport folder, open `__init.py__`
+- Make sure the redis configuration is this: `store = redis.Redis(host="redis", port=6379)` and delete the configuration that using `REDISCLOUD_URL` 
 - Build docker images
   -  `docker-compose build` (This will take some time)
 - Run the services
