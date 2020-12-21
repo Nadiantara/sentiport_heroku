@@ -101,7 +101,7 @@ Root
   - Procfile: Heroku files that contains Flask WSGI basic set up
   - requirements.txt: all library names that is being used in this web app
   - screenshots: folder that contains all screenshots that is being used in this documentation
-  - sentiport: folder 
+  - sentiport: folder that contains routing and all functions that is being used for generating pdf report
     - forms.py: contains Flas-WTForms configuration and set up
     - mail.py: contains all functions that is being used to send the user an email after runing the program
     - pdf_generator.py: contains functions that could generate a pdf report with some specific inputs
@@ -126,7 +126,7 @@ Root
     - `SECRET_KEY=aDAKSKCMAlzakl321s` #up to you, like password for personal debuging
     - `ST_EMAIL=<your email>` #contact us if you want to use supertype email and password
     - `ST_PASSWORD=<your email's password>` 
-    - `REDISCLOUD_URL=<redis cloud url>` #optional if you want to deploy it to heroku, use the url that already given 
+    - `REDISCLOUD_URL=<redis cloud url>` #optional if you want to deploy it to heroku or to run localy without docker, use the url that already given 
   
 #### **1. With Docker**
 - Install Docker 
@@ -148,5 +148,23 @@ Root
   -  `docker-compose up`
   
 #### **2. Without Docker**
-Coming soon if needed
+- For Windows without WSL:
+  - Create virtual environment
+  - Install all requirements with: `pip install -r requirements.txt`
+  - Since we can't install redis on windows then use redis cloud:
+    - [Go to redis home page](https://redislabs.com/redis-enterprise-cloud/overview/)
+    - Create account and use free tier to get redis cloud url
+    - Go to sentiport folder, open `__init.py__`
+    - Make sure the redis configuration is this: `store = redis.from_url(environ.get('REDISCLOUD_URL'))` and delete the configuration that using `host` and `port`
+    - Go to your .env files.
+    - Create `REDISCLOUD_URL` with your Redis cloud url as a value
+    - Run the program using `flask run` on terminal
+
+- For Windows with WSL or Linux:
+  - Create virtual environment in your Linux machine
+  - Install all requirements with: `pip install -r requirements.txt` or `pip3 install -r requirements.txt`
+  - Install redis and activate its service
+  - Go to sentiport folder, open `__init.py__`
+  - Make sure the redis configuration is this: `store = redis.Redis(host="redis", port=6379)` and delete the configuration that using `REDISCLOUD_URL`
+  - Run the program using `flask run` on terminal
 
