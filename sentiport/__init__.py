@@ -16,7 +16,7 @@ thread_lock = Lock()
 threads = {}
 
 # Redis key-val store (use this for heroku deployment without docker)
-store = redis.from_url(environ.get('REDISCLOUD_URL'))
+store = redis.Redis(host="redis", port=6379)
 
 # Redis key-val store (use if you want run it in your local machine or deploy it using docker)
 # store = redis.Redis(host="redis", port=6379)

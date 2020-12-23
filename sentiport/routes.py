@@ -40,9 +40,10 @@ def status(thread_id):
             thread_id,
             "is_running",
             "is_error",
-            "error_message"
+            "error_message",
+            "runtime_message"
             )
-        is_running, is_error, error_message = [status.decode("utf-8") for status in statuses]
+        is_running, is_error, error_message, runtime_message = [status.decode("utf-8") for status in statuses]
         is_running = int(is_running); is_error = int(is_error)
         return jsonify({
             "status": 200,
@@ -51,6 +52,7 @@ def status(thread_id):
                 "isRunning": is_running,
                 "isError": is_error,
                 "errorMessage": error_message,
+                "runtimeMessage": runtime_message
             }
         })
     except Exception as e:
@@ -76,7 +78,7 @@ def delete_thread_status():
 def scrape():
     form = AppForm()
     if form.validate_on_submit():
-        # get some data
+        # get form data
         APP_URL = form.app_id.data
         COUNTRY = request.form['country_code']
         targetmail = form.email.data
@@ -104,7 +106,8 @@ def scrape():
             store.hmset(thread_id, {
                 "is_running": int(True),
                 "is_error": int(False),
-                "error_message": ""
+                "error_message": "",
+                "runtime_message": "Scraping data",
             })
 
             status_url = url_for("status", thread_id=thread_id)
@@ -121,10 +124,10 @@ def scrape():
             return response
 
         flash("""Wrong url or the application doesnt exist""", 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('hello'))
 
     flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
-    return redirect(url_for('index'))
+    return redirect(url_for('hello'))
 
 
 def get_id(toParse):
@@ -138,16 +141,35 @@ def pipeline(playstore_id, country, targetmail, thread_id):
     mkdir(temp_path)
     try:
         """PREPARING PLOTS AND VALUE"""
+        # store status to redis
+        store.hmset(thread_id, {
+            "is_running": int(True),
+            "is_error": int(False),
+            "runtime_message": "Scraping data"
+        })
+
         # crawling
         DATAFRAME = get_crawl_google(playstore_id, country)
+
+        store.hmset(thread_id, {
+            "is_running": int(True),
+            "is_error": int(False),
+            "runtime_message": "Creating PDF"
+        })
 
         with thread_lock:
             filename = create_pdf(DATAFRAME, playstore_id, country, thread_id)
 
+        """SEND THE REPORT THROUGH EMAIL"""
+        store.hmset(thread_id, {
+            "is_running": int(True),
+            "is_error": int(False),
+            "runtime_message": "Sending email"
+        })
+
         uname_targetmail, domain_targetmail = get_user_mail(targetmail)
 
-        """SEND THE REPORT THROUGH EMAIL"""
-        # Account used to send report
+        # Get the account used to send report
         email_address = environ.get('ST_EMAIL')
         print("my email: " + email_address)
         email_password = environ.get('ST_PASSWORD')

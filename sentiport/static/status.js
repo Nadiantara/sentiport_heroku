@@ -22,10 +22,10 @@ function initRenderTaskAlert(
     </div>
     `
     $("#status").append(alertHTML) // appendChild
-    $("#submit-button").attr("disabled") // disable button 
+    $("#submit-button").prop("disabled", true) // disable button 
 }
 
-function modifyTaskAlert(threadID, isRunning, isError) {
+function modifyTaskAlert(threadID, isRunning, isError, runtimeMessage) {
     try {
         if (!isRunning) {
             //add close button
@@ -35,7 +35,7 @@ function modifyTaskAlert(threadID, isRunning, isError) {
             </button>
             `
             $(`#${threadID}`).append(closeButton)
-            $("#submit-button").attr("disabled") // re-enable button
+            $("#submit-button").prop("disabled", false) // re-enable button
             
             //if task finished successfully
             if (!isError) {
@@ -50,6 +50,9 @@ function modifyTaskAlert(threadID, isRunning, isError) {
                 $(`#${threadID}-desc`).html("Failed to send")
             }            
         }
+        else {
+            $(`#${threadID}-heading`).html(runtimeMessage)
+        }
     }
     catch (err) {
         console.log(err)
@@ -63,8 +66,9 @@ async function periodicStatusCheck(statusURL, threadID) {
             .then(res => {
                 let isRunning = res["task_status"]["isRunning"]
                 let isError = res["task_status"]["isError"]
+                let runtimeMessage = res["task_status"]["runtimeMessage"]
 
-                modifyTaskAlert(threadID, isRunning, isError)
+                modifyTaskAlert(threadID, isRunning, isError, runtimeMessage)
 
                 if (isRunning && !isError) {
                     isActive = true
@@ -72,9 +76,8 @@ async function periodicStatusCheck(statusURL, threadID) {
             }) 
             .catch(err => console.log(err))
 
-    if (isActive)
-    {
-        setTimeout(() => periodicStatusCheck(statusURL, threadID), 2000)
+    if (isActive) {
+        setTimeout(() => periodicStatusCheck(statusURL, threadID), 10000)
     }
     else {
         await fetch("status/delete", {
