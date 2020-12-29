@@ -76,59 +76,61 @@ def delete_thread_status():
 
 @app.route("/scrape", methods=['POST'])
 def scrape():
-    form = AppForm()
-    if form.validate_on_submit():
-        # get form data
-        APP_URL = form.app_id.data
-        COUNTRY = request.form['country_code']
-        targetmail = form.email.data
-        try:
-            url_res = requests.get(APP_URL)
-            PLAYSTORE_ID = get_id(APP_URL)
-        except:
-            abort(404)
+    try:
+        form = AppForm()
+        if form.validate_on_submit():
+            # get form data
+            APP_URL = form.app_id.data
+            COUNTRY = request.form['country_code']
+            targetmail = form.email.data
+            try:
+                url_res = requests.get(APP_URL)
+                PLAYSTORE_ID = get_id(APP_URL)
+            except:
+                abort(404)
 
-        # start thread
-        if url_res.status_code == 200:
-            thread_id = str(uuid1())
-            thread = Thread(
-                target=pipeline,
-                args=(
-                    PLAYSTORE_ID,
-                    COUNTRY,
-                    targetmail,
-                    thread_id
+            # start thread
+            if url_res.status_code == 200:
+                thread_id = str(uuid1())
+                thread = Thread(
+                    target=pipeline,
+                    args=(
+                        PLAYSTORE_ID,
+                        COUNTRY,
+                        targetmail,
+                        thread_id
+                    )
                 )
-            )
-            thread.start()
-            
-            # store status to redis
-            store.hmset(thread_id, {
-                "is_running": int(True),
-                "is_error": int(False),
-                "error_message": "",
-                "runtime_message": "Scraping data",
-            })
+                thread.start()
+                
+                # store status to redis
+                store.hmset(thread_id, {
+                    "is_running": int(True),
+                    "is_error": int(False),
+                    "error_message": "",
+                    "runtime_message": "Scraping data",
+                })
 
-            status_url = url_for("status", thread_id=thread_id)
-            response = make_response(render_template(
-                'status.html',
-                status_url=status_url,
-                thread_id=thread_id,
-                playstore_id=PLAYSTORE_ID,
-                country_code=COUNTRY,
-                user_email=targetmail,
-                form=form
-            ))
+                status_url = url_for("status", thread_id=thread_id)
+                response = make_response(render_template(
+                    'status.html',
+                    status_url=status_url,
+                    thread_id=thread_id,
+                    playstore_id=PLAYSTORE_ID,
+                    country_code=COUNTRY,
+                    user_email=targetmail,
+                    form=form
+                ))
 
-            return response
+                return response
 
-        flash("""Wrong url or the application doesnt exist""", 'danger')
-        return redirect(url_for('hello'))
+            flash("""Wrong url or the application doesnt exist""", 'danger')
+            return redirect(url_for('index'))
 
-    flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
-    return redirect(url_for('hello'))
-
+        flash("""Wrong Playstore URL or the app doesnt exist""", 'danger')
+        return redirect(url_for('index'))
+    except:
+        return {"status": 500, "message": "Internal server error"}
 
 def get_id(toParse):
     regex = r'\?id=([a-zA-Z\.]+)'
