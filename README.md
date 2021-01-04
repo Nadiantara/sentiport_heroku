@@ -1,6 +1,11 @@
 # **sentiport**
-Super-minimalistic app version of the Data Analysts' sentiment analysis automated reporting 
+Super-minimalistic app version of the Data Analysts' sentiment analysis automated reporting. This web app scrape data from google play store and then send you the analysis as a pdf file to your email. 
 
+## **Prerequisites**
+Before starting to contribute, make sure you are familiar with these tools:
+  - Python
+  - Flask
+  - Deployment to Heroku
 ## **Preview**
 ![Image](screenshots/sentiport-preview.jpg)
 
