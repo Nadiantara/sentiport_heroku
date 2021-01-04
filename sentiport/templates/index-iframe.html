@@ -11,30 +11,11 @@
 
 <body>
     <div class="p-4">
-        <!-- Bootstrap flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
         <h1>Sentiport</h1>
-        <form method="POST" action="/scrape">
-            {{ form.hidden_tag() }}
+        <form method="POST" action="{{url_for('scrape')}}">
             <div id="playstore-id-query" class="form-group w-50">
-                <!-- form.app_id.label -->
                 <a class="my-0 py-0">Playstore URL</a>
-                {{ form.app_id(class="form-control", placeholder="https://play.google.com/store/apps/details?id=com.whatsapp") }}
-                {% for error in form.app_id.errors %}
-                <span class="text-danger">{{ error }}</span>
-                {% endfor %}
+                <input id="app_id" type="text" name="app_id" class="form-control" placeholder="https://play.google.com/store/apps/details?id=com.whatsapp">
             </div>
             <div id="country-code-query" class="form-group w-50">
                 <a class="my-0 py-0">Review Origin</a>
@@ -55,12 +36,8 @@
                 </select>
             </div>
             <div id="email-query" class="form-group w-50">
-                <!-- form.app_id.label-->
                 <a class="my-0 py-0">Your Email</a>
-                {{ form.email(class="form-control") }}
-                {% for error in form.email.errors %}
-                <span class="text-danger">{{ error }}</span>
-                {% endfor %}
+                <input id="email" type="email" name="email" class="form-control">
             </div>
             <div class="form-group"></div>
             <button id="submit-button" type="submit" class="btn btn-outline-info">Submit</button>
@@ -78,8 +55,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='status.js') }}"></script>
-    {% block status_checker %}{% endblock status_checker %}
 </body>
 </html>
 

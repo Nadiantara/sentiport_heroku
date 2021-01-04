@@ -27,9 +27,14 @@ def not_found_error(error):
 
 
 @app.route("/", methods=['GET', 'POST'])
+@app.route("/iframe", methods=['GET', 'POST'])
 def index():
-    form = AppForm()
-    return render_template('index.html', form=form)
+    rule = request.url_rule
+    if "iframe" in rule.rule:
+        return render_template('index-iframe.html')
+    else:
+        form = AppForm()
+        return render_template('index.html', form=form)
 
 
 @app.route("/status/<thread_id>", methods=['GET'])
@@ -75,14 +80,28 @@ def delete_thread_status():
 
 
 @app.route("/scrape", methods=['POST'])
+@app.route("/scrape/iframe", methods=['POST'])
 def scrape():
     try:
-        form = AppForm()
-        if form.validate_on_submit():
-            # get form data
+        rule = request.url_rule
+        is_iframe = "iframe" in rule.rule
+        form = None
+        
+        if is_iframe:
+            APP_URL = request.form['app_id']
+            COUNTRY = request.form['country_code']
+            targetmail = request.form['email']
+            # DEBUG
+            print(request.form)
+            is_form_valid = True # Bypass rule
+        else:
+            form = AppForm()
             APP_URL = form.app_id.data
             COUNTRY = request.form['country_code']
             targetmail = form.email.data
+            is_form_valid = form.validate_on_submit()
+        
+        if is_form_valid:            
             try:
                 url_res = requests.get(APP_URL)
                 PLAYSTORE_ID = get_id(APP_URL)
@@ -98,21 +117,26 @@ def scrape():
                         PLAYSTORE_ID,
                         COUNTRY,
                         targetmail,
-                        thread_id
+                        thread_id,
+                        is_iframe
                     )
                 )
                 thread.start()
                 
                 # store status to redis
-                store.hmset(thread_id, {
-                    "is_running": int(True),
-                    "is_error": int(False),
-                    "error_message": "",
-                    "runtime_message": "Scraping data",
-                })
+                if not is_iframe:
+                    store.hmset(thread_id, {
+                        "is_running": int(True),
+                        "is_error": int(False),
+                        "error_message": "",
+                        "runtime_message": "Scraping data",
+                    })
 
+                if is_iframe:
+                    return redirect(url_for('index'))
+                
                 status_url = url_for("status", thread_id=thread_id)
-                response = make_response(render_template(
+                return make_response(render_template(
                     'status.html',
                     status_url=status_url,
                     thread_id=thread_id,
@@ -121,8 +145,7 @@ def scrape():
                     user_email=targetmail,
                     form=form
                 ))
-
-                return response
+                
 
             flash("""Wrong url or the application doesnt exist""", 'danger')
             return redirect(url_for('index'))
@@ -138,36 +161,39 @@ def get_id(toParse):
     return app_id
 
 
-def pipeline(playstore_id, country, targetmail, thread_id):
+def pipeline(playstore_id, country, targetmail, thread_id, is_iframe):
     temp_path = f'sentiport/artifacts/{thread_id}'
-    mkdir(temp_path)
+    mkdir(temp_path) 
     try:
         """PREPARING PLOTS AND VALUE"""
         # store status to redis
-        store.hmset(thread_id, {
-            "is_running": int(True),
-            "is_error": int(False),
-            "runtime_message": "Scraping data"
-        })
+        if not is_iframe:
+            store.hmset(thread_id, {
+                "is_running": int(True),
+                "is_error": int(False),
+                "runtime_message": "Scraping data"
+            })
 
         # crawling
         DATAFRAME = get_crawl_google(playstore_id, country)
 
-        store.hmset(thread_id, {
-            "is_running": int(True),
-            "is_error": int(False),
-            "runtime_message": "Creating PDF"
-        })
+        if not is_iframe:
+            store.hmset(thread_id, {
+                "is_running": int(True),
+                "is_error": int(False),
+                "runtime_message": "Creating PDF"
+            })
 
         with thread_lock:
             filename = create_pdf(DATAFRAME, playstore_id, country, thread_id)
 
         """SEND THE REPORT THROUGH EMAIL"""
-        store.hmset(thread_id, {
-            "is_running": int(True),
-            "is_error": int(False),
-            "runtime_message": "Sending email"
-        })
+        if not is_iframe:
+            store.hmset(thread_id, {
+                "is_running": int(True),
+                "is_error": int(False),
+                "runtime_message": "Sending email"
+            })
 
         uname_targetmail, domain_targetmail = get_user_mail(targetmail)
 
@@ -205,7 +231,7 @@ def pipeline(playstore_id, country, targetmail, thread_id):
         encoders.encode_base64(p)
 
         p.add_header('Content-Disposition',
-                     "attachment; filename= %s" % filename)
+                        "attachment; filename= %s" % filename)
 
         msg.attach(p)
 
@@ -218,18 +244,19 @@ def pipeline(playstore_id, country, targetmail, thread_id):
         print('Email sent successfully')
 
         # store status to redis
-        store.hmset(thread_id, {
-            "is_running": int(False),
-            "is_error": int(False)
-        })
+        if not is_iframe:
+            store.hmset(thread_id, {
+                "is_running": int(False),
+                "is_error": int(False)
+            })
 
     except Exception as e:
         # store status to redis
-        store.hmset(thread_id, {
-            "is_running": int(False),
-            "is_error": int(True),
-            "error_message": str(e)
-        })
-
+        if not is_iframe:
+            store.hmset(thread_id, {
+                "is_running": int(False),
+                "is_error": int(True),
+                "error_message": str(e)
+            })
     finally:
         rmtree(temp_path)
