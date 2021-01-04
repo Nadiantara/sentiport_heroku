@@ -170,9 +170,9 @@ def plot_totalreview_time(data, temp_dir):
     plt.savefig(f'sentiport/artifacts/{temp_dir}/fig_review_rating_time.png',
                 bbox_inches='tight')
 
-    review_by_time = data.groupby('time').review.nunique()
-    review_by_time = pd.DataFrame(review_by_time)
-    review_by_time = review_by_time.reset_index()
+    # review_by_time = data.groupby('time').review.nunique()
+    # review_by_time = pd.DataFrame(review_by_time)
+    # review_by_time = review_by_time.reset_index()
 
     idmax = review_by_time['review'].idxmax()
     idmin = review_by_time['review'].idxmin()
@@ -251,9 +251,9 @@ def plot_totalreview_version(data, temp_dir):
     plt.savefig(f'sentiport/artifacts/{temp_dir}/fig_review_rating_version.png',
                 bbox_inches='tight')
 
-    review_by_version = data.groupby('version').review.nunique()
-    review_by_version = pd.DataFrame(review_by_version)
-    review_by_version = review_by_version.reset_index()
+    # review_by_version = data.groupby('version').review.nunique()
+    # review_by_version = pd.DataFrame(review_by_version)
+    # review_by_version = review_by_version.reset_index()
 
     idmax = review_by_version['review'].idxmax()
     idmin = review_by_version['review'].idxmin()
@@ -349,9 +349,6 @@ def plot_sentiment_time(data, temp_dir):
     neg_min_time = pivot['time'][idmin_neg]
 
     labels = pivot['time']
-    neg = pivot['Negative']
-    neu = pivot['Neutral']
-    pos = pivot['Positive']
 
     x_vals = range(0, len(pivot['time']))
     x = np.arange(len(labels))
@@ -364,7 +361,7 @@ def plot_sentiment_time(data, temp_dir):
     obj = ax.bar(x + width, pos, width, label='Positive', color='#1B290D')
 
     obj = ax.set_title('Review Sentiment Across Time', fontproperties=fontprop)
-    obj = ax.legend()
+    # obj = ax.legend()
     obj = plt.xticks(x_vals, pivot['time'], fontsize=7)
     obj = plt.ylabel("Number of Review", fontproperties=fontprop_label)
     obj = plt.box(False)
@@ -398,7 +395,6 @@ def plot_sentiment_version(data, temp_dir):
                            columns='sentiment', values='total')
     pivot = pivot.reset_index()
     pivot = pivot.rename(columns={'sentiment': 'no'})
-
     idmax_pos = pivot['Positive'].idxmax()
     idmin_pos = pivot['Positive'].idxmin()
 
