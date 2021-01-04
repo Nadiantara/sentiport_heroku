@@ -73,7 +73,7 @@ def plot_overall_rating(dataframe, temp_dir):
     })
 
     plt.grid(b=None)
-    #sub1 = plt.subplot(111)
+    sub1 = plt.subplot(111)
     ax = sns.barplot(value, bars, palette='mycolormap')
 
     # Create names on the y-axis
