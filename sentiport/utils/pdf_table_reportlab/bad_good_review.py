@@ -13,6 +13,8 @@ from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.styles import getSampleStyleSheet
 from math import log
+import nltk
+#nltk.download('brown')
 styleSheet = getSampleStyleSheet()
 translator = Translator()
 
@@ -338,6 +340,64 @@ def tag_words(dataframe, row_number):
     return dataframe
 
 
+def tag_words_np(dataframe, row_number):
+  txt = dataframe.original_review[row_number]
+  blob = TextBlob(txt)
+  x = blob.noun_phrases
+
+  for j in x:
+    #print(j)
+    sent = TextBlob(j).sentiment.polarity
+    #txt_lower = txt.lower()
+    if j in txt:
+      #print(j)
+      txt = txt.replace(j, 'NP')
+
+      words = txt.split()
+      i = 0
+      txt = ""
+      for word in words:
+        if 'NP' in word:
+          if sent > 0:
+            if i == 0:
+              txt += "<font color=#199600><b>" + 'NP' + "</b></font>"
+            elif i > 0:
+              txt += " " + "<font color=#199600><b>" + 'NP' + "</b></font>"
+          elif sent < 0:
+            if i == 0:
+              txt += "<font color=#8a0000><b>" + 'NP' + "</b></font>"
+            elif i > 0:
+              txt += " " + "<font color=#8a0000><b>" + 'NP' + "</b></font>"
+          elif sent == 0:
+            if i == 0:
+              txt += j
+            elif i > 0:
+              txt += " " + j
+        else:
+          senti_score = TextBlob(word).sentiment.polarity
+          if senti_score > 0:
+            if i == 0:
+              txt += "<font color=#199600><b>" + word + "</b></font>"
+            elif i > 0:
+              txt += " " + "<font color=#199600><b>" + word + "</b></font>"
+          elif senti_score < 0:
+            if i == 0:
+              txt += "<font color=#8a0000><b>" + word + "</b></font>"
+            elif i > 0:
+              txt += " " + "<font color=#8a0000><b>" + word + "</b></font>"
+          elif senti_score == 0:
+            if i == 0:
+              txt += word
+            elif i > 0:
+              txt += " " + word
+          i += 1
+      txt = txt.replace('NP', j)
+
+  dataframe.iloc[row_number, dataframe.columns.get_loc(
+      'original_review')] = txt
+  return dataframe
+
+
 def transform_bad_review(bad_review):
     bad_review['score'] = round(bad_review['score'], 2)
     bad_review = bad_review[['original_review', 'score']]
@@ -346,7 +406,7 @@ def transform_bad_review(bad_review):
 
     for i in range(len(sentence_rank_1)):
         sentence_rank_1 = add_enter(sentence_rank_1, i)
-        sentence_rank_1 = tag_words(sentence_rank_1, i)
+        sentence_rank_1 = tag_words_np(sentence_rank_1, i)
 
     sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
         columns={'original_review': 'Reviews'}, inplace=False)
@@ -361,7 +421,7 @@ def transform_good_review(good_review):
 
     for i in range(len(sentence_rank_1)):
         sentence_rank_1 = add_enter(sentence_rank_1, i)
-        sentence_rank_1 = tag_words(sentence_rank_1, i)
+        sentence_rank_1 = tag_words_np(sentence_rank_1, i)
 
     sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
         columns={'original_review': 'Reviews'}, inplace=False)

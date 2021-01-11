@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup as soup
 def get_crawl_google(id, country_id):
 
     BATCH_SIZE = 50
-    MAX_REVIEWS = 2000
+    MAX_REVIEWS = 3000
     appinfo = app(
         id,
         lang='en',
