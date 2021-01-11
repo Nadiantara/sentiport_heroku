@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.colors as mcolors
 import matplotlib.cm
 import matplotlib.font_manager as fm
+import matplotlib.ticker as plticker
+import seaborn as sns
 
 # -*- coding: utf-8 -*-
 """Matplotlib_02.ipynb
@@ -28,7 +30,7 @@ def plot_overall_rating(dataframe, temp_dir):
 
     Parameters:
     dataframe-- data from get_crawl_data (but we can put data from apple scrapper if the columns names are identical)
-    
+
     returns:
     plot
     '''
@@ -38,25 +40,57 @@ def plot_overall_rating(dataframe, temp_dir):
     grouped_multiple = df.groupby(['rating']).agg({'review': ['count']})
     grouped_multiple.columns = ['review']
     grouped_multiple = grouped_multiple.reset_index()
-    grouped_multiple.sort_values(by=['rating', 'review'], inplace=False, ascending=False)
-    grouped_multiple['value'] = (grouped_multiple['review'] / grouped_multiple['review'].sum()) * 100
+    grouped_multiple.sort_values(
+        by=['rating', 'review'], inplace=False, ascending=False)
+    grouped_multiple['value'] = (
+        grouped_multiple['review'] / grouped_multiple['review'].sum()) * 100
     grouped_multiple['value'] = grouped_multiple['value'].astype(int)
+    grouped_multiple['star'] = grouped_multiple['rating'].astype(str) + '★'
+    grouped_multiple = grouped_multiple.sort_values(
+        by='rating', ascending=False)
 
-    # Plot
     value = grouped_multiple['value']
-    bars = grouped_multiple['rating']
-    cmap = mcolors.LinearSegmentedColormap.from_list("", ["#e0432f", "#44bb55"])
+    bars = grouped_multiple['star'].astype(str)
 
-    # Create horizontal bars
-    plt.figure(figsize=(3.8377, 2.9858), dpi=100)
-    plt.barh(bars, value, color=cmap(grouped_multiple.rating.values / grouped_multiple.rating.values.max()))
+    obj = plt.figure(figsize=(3.8377, 2.9858), dpi=100)
+
+    max = int(grouped_multiple['rating'].max())
+    min = int(grouped_multiple['rating'].min())
+    cvals = [min, (min+max)/2, max]
+    colors = [(197/255, 186/255, 160/255), (209/255, 200 /
+                                            255, 179/255), (236/255, 233/255, 224/255)]
+
+    norm = plt.Normalize(min, max)
+    tuples = list(zip(map(norm, cvals), colors))
+    cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", tuples)
+    matplotlib.cm.register_cmap("mycolormap", cmap)
+    cpal = sns.color_palette("mycolormap", n_colors=64, desat=0.2)
+
+    plt.rcParams.update({
+        "figure.facecolor":  (1.0, 1.0, 1.0, 1.0),  # red   with alpha = 100%
+        "axes.facecolor":    (1.0, 1.0, 1.0, 1.0),  # green with alpha = 100%
+        "savefig.facecolor": (1.0, 1.0, 1.0, 1.0),  # blue  with alpha = 100%
+    })
+
+    plt.grid(b=None)
+    #sub1 = plt.subplot(111)
+    ax = sns.barplot(value, bars, palette='mycolormap')
 
     # Create names on the y-axis
-    plt.yticks(bars)
-    plt.title("Total Rating", fontproperties=fontprop)
-    plt.xlabel("%")
-    plt.xlim(xmin=0)
-    plt.ylim(ymin=0)
+    # plt.yticks(bars)
+    plt.title("Rating", fontproperties=fontprop)
+    plt.ylabel(None)
+    plt.yticks(fontsize=15)
+    plt.xticks(fontsize=10)
+    # Hiding xaxes
+    ax = plt.gca()
+    ax.axes.xaxis.set_visible(False)
+    # Putting value on top of bar
+
+    for index, value in enumerate(value):
+        plt.text(value + 2, index + 0.15, str(value) + '%', fontsize=15)
+
+    sns.despine(left=True, bottom=True, right=True, top=True)
     plt.grid(False)
 
     plt.savefig(f"sentiport/artifacts/{temp_dir}/fig_overall_rating.png",
