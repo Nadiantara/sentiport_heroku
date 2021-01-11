@@ -139,9 +139,9 @@ def get_total_language(DATAFRAME):
 
 
 def f(t):
-    s1 = np.cos(2 * np.pi * t)
-    e1 = np.exp(-t)
-    return np.multiply(s1, e1)
+    s1 = cos(2 * pi * t)
+    e1 = exp(-t)
+    return multiply(s1, e1)
 
 
 def plot_total_language(DATAFRAME):
@@ -194,7 +194,7 @@ def plot_total_language1(DATAFRAME, temp_dir):
     # plt.subplot(title='Number of Reviews by Language')
 
     plt.grid(b=None)
-    #sub1 = subplot(111)
+    sub1 = subplot(111)
     ax = sns.barplot(x='review', y='Language', data=lang, palette='mycolormap')
 
     total = lang['review'].sum()

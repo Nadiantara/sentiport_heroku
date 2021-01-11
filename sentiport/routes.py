@@ -155,8 +155,9 @@ def scrape():
     except:
         return {"status": 500, "message": "Internal server error"}
 
+
 def get_id(toParse):
-    regex = r'\?id=([a-zA-Z\.]+)'
+    regex = r'\?id=([a-zA-Z0-9\.]+)'
     app_id = re.findall(regex, toParse)[0]
     return app_id
 
