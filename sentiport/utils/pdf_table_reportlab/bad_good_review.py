@@ -166,7 +166,7 @@ def remove_emoji(dataframe):
         dataframe['original_review'] = dataframe['original_review'].apply(
             deEmojify)  # removing emoji
     except Exception as e:
-        pass
+        print(e)
     return dataframe
 
 
@@ -176,15 +176,18 @@ def top_bad_review(dataframe, bad_review):
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
     dataframe = remove_emoji(dataframe)
-
-    # bad_review = bad_review.rename(columns={'score':'score'})
-    bad_review = pd.merge(bad_review, dataframe, on=[
-                          'index', 'rating', 'word_count_score'], how='inner')
-    bad_review = bad_review[['original_review', 'score']]
-    bad_review = bad_review.sort_values(
-        'score', ascending=True).reset_index(drop=True)
-    bad_review['score'] = -(bad_review['score']/bad_review['score'][0])
-    bad_review = bad_review[:5]
+    try:
+        # bad_review = bad_review.rename(columns={'score':'score'})
+        bad_review = pd.merge(bad_review, dataframe, on=[
+                            'index', 'rating', 'word_count_score'], how='inner')
+        bad_review = bad_review[['original_review', 'score']]
+        bad_review = bad_review.sort_values(
+            'score', ascending=True).reset_index(drop=True)
+        bad_review['score'] = -(bad_review['score']/bad_review['score'][0])
+        bad_review = bad_review[:5]
+    except Exception as e:
+        print(e)
+        pass
     return bad_review
 
 
@@ -213,15 +216,18 @@ def top_good_review(dataframe, good_review):
     dataframe = dataframe.rename(columns={'review': 'original_review'})
     # dataframe = get_lowercase(dataframe)
     dataframe = remove_emoji(dataframe)
-
-    # good_review = good_review.rename(columns={'score':'score'})
-    good_review = pd.merge(good_review, dataframe, on=[
-                           'index', 'rating', 'word_count_score'], how='inner')
-    good_review = good_review[['original_review', 'score']]
-    good_review = good_review.sort_values(
-        'score', ascending=False).reset_index(drop=True)
-    good_review['score'] = good_review['score']/good_review['score'][0]
-    good_review = good_review[:5]
+    try:
+        # good_review = good_review.rename(columns={'score':'score'})
+        good_review = pd.merge(good_review, dataframe, on=[
+                            'index', 'rating', 'word_count_score'], how='inner')
+        good_review = good_review[['original_review', 'score']]
+        good_review = good_review.sort_values(
+            'score', ascending=False).reset_index(drop=True)
+        good_review['score'] = good_review['score']/good_review['score'][0]
+        good_review = good_review[:5]
+    except Exception as e:
+        print(e)
+        pass
     return good_review
 
 
