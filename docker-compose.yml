@@ -4,7 +4,7 @@ services:
     web:
         image: sentiport-heroku_web:topic-extraction-packed
         build: .
-        command: gunicorn --bind :8000 sentiport:app --reload # DEBUG
+        command: gunicorn --bind :8000 sentiport:app # DEBUG
         volumes:
           - ./sentiport:/sentiport
           - ./sentiport/static:/sentiport/static
