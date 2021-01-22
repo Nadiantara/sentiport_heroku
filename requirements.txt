@@ -47,3 +47,6 @@ wordcloud==1.8.0
 WTForms==2.3.3
 email-validator==1.1.2
 dnspython==2.0.0
+python_dateutil==2.8.1
+pyspark==2.4.7
+textacy==0.10.0

@@ -407,17 +407,20 @@ def tag_words_np(dataframe, row_number):
 
 
 def transform_bad_review(bad_review):
-    bad_review['score'] = round(bad_review['score'], 2)
-    bad_review = bad_review[['original_review', 'score']]
-    sentence_rank_1 = bad_review[:50].reset_index(
-        drop=True).reset_index(col_fill='class', col_level=1, drop=True)
+    try:
+        bad_review['score'] = round(bad_review['score'], 2)
+        bad_review = bad_review[['original_review', 'score']]
+        sentence_rank_1 = bad_review[:50].reset_index(
+            drop=True).reset_index(col_fill='class', col_level=1, drop=True)
 
-    for i in range(len(sentence_rank_1)):
-        sentence_rank_1 = add_enter(sentence_rank_1, i)
-        sentence_rank_1 = tag_words_np(sentence_rank_1, i)
+        for i in range(len(sentence_rank_1)):
+            sentence_rank_1 = add_enter(sentence_rank_1, i)
+            sentence_rank_1 = tag_words_np(sentence_rank_1, i)
 
-    sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
-        columns={'original_review': 'Reviews'}, inplace=False)
+        sentence_rank_1 = sentence_rank_1[['original_review', 'score']].rename(
+            columns={'original_review': 'Reviews'}, inplace=False)
+    except Exception as e:
+        print(e)
     return sentence_rank_1
 
 
