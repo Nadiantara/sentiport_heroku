@@ -121,13 +121,14 @@ def get_crawl_google (id, country_id):
                      keep = False, inplace = True) 
   return df_google, appDesc
 
+
 def app_info(id, country_id):
   appinfo = app(
-    id,
-    lang='en',
-    country=country_id
+      id,
+      lang='en',
+      country=country_id
   )
-  return appinfo['title'],appinfo['description']
+  return appinfo['title'], appinfo['description']
 
 # @title YAKE helper functions
 def concatening_ngrams(keywords):

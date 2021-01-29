@@ -1,7 +1,7 @@
 # analyst libraries
 matplotlib==3.2.2
-langdetect==1.0.8
 altair==4.1.0
+langdetect==1.0.8
 cmasher==1.5.5
 nltk==3.5
 spacy==2.3.2
@@ -23,6 +23,9 @@ emoji==0.6.0
 beautifulsoup4==4.9.3
 python_dateutil==2.8.1
 pyspark==2.4.7
+pylab-sdk
+ipywidgets
+jupyter
 # production libraries
 Flask
 flask_mail

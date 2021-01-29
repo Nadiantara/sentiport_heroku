@@ -135,7 +135,7 @@ def get_total_language(DATAFRAME):
     for i in range(len(lang)):
         list_lang.append(country_list[lang.lang[i]])
     lang['Language'] = pd.DataFrame(list_lang)
-    return lang
+    return lang, DATAFRAME1
 
 
 def f(t):
@@ -170,79 +170,78 @@ def plot_total_language1(DATAFRAME, temp_dir):
     '''
     Function to get plot total language using matplotlib library
     '''
-    lang = get_total_language(DATAFRAME)
+    lang, DATAFRAME1 = get_total_language(DATAFRAME)
     most_lang = lang['Language'][0]
     max = int(lang['review'].max())
     min = int(lang['review'].min())
-    cvals = [min, (min + max) / 2, max]
-    colors = [(109 / 255, 0 / 255, 0 / 255), (220 / 255, 211 /
-                                              255, 196 / 255), (0 / 255, 0 / 255, 0 / 255)]
+    cvals  = [min, (min+max)/2, max]
+    colors = [(109/255, 0/255, 0/255), (220/255, 211/255, 196/255), (0/255, 0/255, 0/255)]
 
-    norm = plt.Normalize(min, max)
-    tuples = list(zip(map(norm, cvals), colors))
+    norm=plt.Normalize(min,max)
+    tuples = list(zip(map(norm,cvals), colors))
     cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", tuples)
     matplotlib.cm.register_cmap("mycolormap", cmap)
     cpal = sns.color_palette("mycolormap", n_colors=64, desat=0.2)
 
     plt.rcParams.update({
-        "figure.facecolor": (1.0, 1.0, 1.0, 1.0),  # red   with alpha = 30%
-        "axes.facecolor": (1.0, 1.0, 1.0, 1.0),  # green with alpha = 50%
+        "figure.facecolor":  (1.0, 1.0, 1.0, 1.0),  # red   with alpha = 30%
+        "axes.facecolor":    (1.0, 1.0, 1.0, 1.0),  # green with alpha = 50%
         "savefig.facecolor": (1.0, 1.0, 1.0, 1.0),  # blue  with alpha = 20%
-    })
+        })
 
-    obj = plt.figure(figsize=(10, 5))
-    # plt.subplot(title='Number of Reviews by Language')
+    obj = plt.figure(figsize=(10,5))
+    #plt.subplot(title='Number of Reviews by Language')
 
     plt.grid(b=None)
     sub1 = subplot(111)
-    ax = sns.barplot(x='review', y='Language', data=lang, palette='mycolormap')
+    ax = sns.barplot(x='review',y='Language', data=lang, palette='mycolormap')
 
     total = lang['review'].sum()
     for p in ax.patches:
-        percentage = '{:.1f}%'.format(100 * p.get_width() / total)
+        percentage = '{:.1f}%'.format(100 * p.get_width()/total)
         number = '{:.0f}'.format(total)
         x = p.get_x() + p.get_width() + 0.02
-        y = p.get_y() + p.get_height() / 2
+        y = p.get_y() + p.get_height()/2
         ax.annotate(percentage, (x, y))
-
+        
+        
     sns.despine(left=True, bottom=True, right=True, top=True)
     grid(False)
     title('Total Review by Language')
     ylabel('')
     xlabel('')
 
-    # I ADDED THIS FOR BORDERLINE
+    ## I ADDED THIS FOR BORDERLINE
     autoAxis = sub1.axis()
-    rec = Rectangle((autoAxis[0] - 15, autoAxis[2] + 0.4), (autoAxis[1] - autoAxis[0]) + 20,
-                    (autoAxis[3] - autoAxis[2]) - 0.7, fill=False, lw=2)
+    rec = Rectangle((autoAxis[0]-15,autoAxis[2]+0.4),(autoAxis[1]-autoAxis[0])+20,(autoAxis[3]-autoAxis[2])-0.7,fill=False,lw=2)
     rec = sub1.add_patch(rec)
     rec.set_clip_on(False)
 
     obj.savefig(f'sentiport/artifacts/{temp_dir}/fig_lang.png')
 
-    return f'sentiport/artifacts/{temp_dir}/fig_lang.png', most_lang
+    return f'sentiport/artifacts/{temp_dir}/fig_lang.png', most_lang, DATAFRAME1
 
 
 def plot_detect_language2(DATAFRAME, temp_dir):
     '''
     Function to get plot dougnut chart for detect language
     '''
-    # get the dataframe & prepare for plot
-    lang = get_total_language(DATAFRAME)
+    #get the dataframe & prepare for plot
+    lang, DATAFRAME1 = get_total_language(DATAFRAME)
     most_lang = lang['Language'][0]
-    # Create new column to get anotate value for plot
+    #Create new column to get anotate value for plot
     anotate_col = 'anotate'
     percent_format = "{0:.1f}%"
     percent_coeff = 100
-    lang[anotate_col] = (lang.review / lang.review.sum())
-    lang[anotate_col] = pd.Series([percent_format.format(val * percent_coeff) for val in lang[anotate_col]],
-                                  index=lang.index)
+    lang[anotate_col] = (lang.review/lang.review.sum())
+    lang[anotate_col] = pd.Series([percent_format.format(
+        val * percent_coeff) for val in lang[anotate_col]], index=lang.index)
     lang[anotate_col] = lang[anotate_col].str.cat(lang.Language, sep=' ')
-    # define value for the label
+    #define value for the label
     anotate = lang.anotate.to_list()
     data = lang.review.to_list()
 
-    # Set parameter for plot
+    #Set parameter for plot
     cmap_type = 'cmr.sepia_r'
     color_format = 'hex'
     rcParams = 'axes.prop_cycle'
@@ -253,40 +252,42 @@ def plot_detect_language2(DATAFRAME, temp_dir):
     width = 0.5
     angle = -40
 
-    # Set color map using cmasher
+    #Set color map using cmasher
     colors = cmr.take_cmap_colors(
         cmap_type, cmap_n, cmap_range=cmap_range, return_fmt=color_format)
     plt.rcParams[rcParams] = cycler(color=colors)
 
-    # install font for plot
+
+    #install font for plot
     path = 'sentiport/utils/Helvetica-Font/Helvetica-Bold.ttf'
     path1 = 'sentiport/utils/Helvetica-Font/Helvetica-Oblique.ttf'
     Helvetica_Bold = fm.FontProperties(fname=path, size=18)
     Helvetica = fm.FontProperties(fname=path1, size=15)
 
-    # Create the plot function to generate dougnut chart
+    #Create the plot function to generate dougnut chart
     obj, ax = plt.subplots(figsize=(9.03307, 4.7017),
-                           dpi=100, subplot_kw=dict(aspect=aspect))
-    wedges, texts = ax.pie(data, wedgeprops=dict(
-        width=width), startangle=angle)
+                            dpi=100, subplot_kw=dict(aspect=aspect))
+    wedges, texts = ax.pie(data, wedgeprops=dict(width=width), startangle=angle)
     bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
     kw = dict(arrowprops=dict(arrowstyle="-"),
-              bbox=bbox_props, zorder=0, va="center")
+            bbox=bbox_props, zorder=0, va="center")
 
     for i, p in enumerate(wedges):
-        ang = (p.theta2 - p.theta1) / 2. + p.theta1
+        ang = (p.theta2 - p.theta1)/2. + p.theta1
         y = np.sin(np.deg2rad(ang))
         x = np.cos(np.deg2rad(ang))
         horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
         connectionstyle = "angle,angleA=0,angleB={}".format(ang)
         kw["arrowprops"].update({"connectionstyle": connectionstyle})
-        ax.annotate(anotate[i], xy=(x, y), xytext=(1.35 * np.sign(x), 1.4 * y),
+        ax.annotate(anotate[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                     horizontalalignment=horizontalalignment, **kw, fontproperties=Helvetica)
+        
 
-    sumstr = 'From\n' + str(lang.review.sum()) + '\nReviews'
+    sumstr = 'From\n'+str(lang.review.sum())+'\nReviews'
     ax.text(0., 0., sumstr, horizontalalignment='center',
             verticalalignment='center', fontproperties=Helvetica_Bold)
 
     obj.savefig(f'sentiport/artifacts/{temp_dir}/fig_lang.png')
-
-    return f'sentiport/artifacts/{temp_dir}/fig_lang.png', most_lang
+    fig_path = f'sentiport/artifacts/{temp_dir}/fig_lang.png'
+    
+    return fig_path, most_lang, DATAFRAME1
