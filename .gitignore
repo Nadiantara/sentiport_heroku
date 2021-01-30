@@ -27,3 +27,4 @@ venv.bak/
 !sentiport/utils/assets/**
 !screenshots/**
 .*
+run-command.txt

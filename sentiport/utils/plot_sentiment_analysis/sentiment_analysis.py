@@ -55,7 +55,7 @@ def preprocessing_weeks(TRANSLATED_DATAFRAME):
     for i in TRANSLATED_DATAFRAME['week_number']:
         week_list.append('Week ' + str(i))
 
-    TRANSLATED_DATAFRAME['time'] = week_list
+    TRANSLATED_DATAFRAME['week_time'] = week_list
     TRANSLATED_DATAFRAME.drop('week_number', axis=1, inplace=True)
 
     if "Unnamed: 0" in TRANSLATED_DATAFRAME.columns:
@@ -115,20 +115,26 @@ def get_sentiment_dataframe(TRANSLATED_DATAFRAME):
     check_month['at'] = pd.to_datetime(check_month['time'])
     months = check_month['time'].nunique()
 
-    if months >= 3:
+    if months >= 4:
         return check_month
     else:
-        print("Data less than 3  mos")
+        print("Data less than 4  mos")
         TRANSLATED_DATAFRAME = preprocessing_weeks(TRANSLATED_DATAFRAME)
         return TRANSLATED_DATAFRAME
 
 
 def plot_totalreview_time(data, temp_dir):
-    review_by_time = pd.DataFrame(data.groupby('at').count()['review']).join(
-        data.groupby('at').mean()['rating'])
-    review_by_time = review_by_time.reset_index()
-
-    review_by_time['time'] = review_by_time['at'].dt.strftime("%b %Y")
+    if "week_time" in data.columns:
+        review_by_time = pd.DataFrame(data.groupby('week_time').count()['review']).join(
+            data.groupby('week_time').mean()['rating'])
+        review_by_time = review_by_time.reset_index()
+        review_by_time['time'] = review_by_time['week_time']
+    else:
+        review_by_time = pd.DataFrame(data.groupby('at').count()['review']).join(
+            data.groupby('at').mean()['rating'])
+        review_by_time = review_by_time.reset_index()
+        review_by_time['time'] = pd.to_datetime(review_by_time['at'])
+        review_by_time['time'] = review_by_time['time'].dt.strftime("%b %Y")
 
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "", ["#bba68a", "#957347", "#8b6636"])
@@ -209,6 +215,10 @@ def plot_totalreview_version(data, temp_dir):
     review_by_version = review_by_version[-len(panjang_data):]
     review_by_version.reset_index(inplace=True)
 
+    version = review_by_version['version'].nunique()
+    if version > 20:
+        review_by_version = review_by_version[:20]
+
     cmap = mcolors.LinearSegmentedColormap.from_list(
         "", ["#aa6a6a", "#791515", "#6d0000"])
 
@@ -273,29 +283,38 @@ def plot_totalreview_sentiment(data, temp_dir):
         columns={'index': 'sentiment', 'sentiment': 'total'}, inplace=True)
     review_by_sentiment = review_by_sentiment.sort_values(
         by=['sentiment'], ascending=False)
-
-    pos_index = review_by_sentiment[review_by_sentiment['sentiment']
-                                    == 'Positive']['total'].index.values[0]
-    neu_index = review_by_sentiment[review_by_sentiment['sentiment']
-                                    == 'Neutral']['total'].index.values[0]
-    neg_index = review_by_sentiment[review_by_sentiment['sentiment']
-                                    == 'Negative']['total'].index.values[0]
+    sentiment = []
+    for i in review_by_sentiment['sentiment']:
+        sentiment.append(i)
 
     total = review_by_sentiment['total'].sum()
-    pos = review_by_sentiment['total'][pos_index]
-    neu = review_by_sentiment['total'][neu_index]
-    neg = review_by_sentiment['total'][neg_index]
-
-    pos_percentage = (pos / total) * 100
-    neu_percentage = (neu / total) * 100
-    neg_percentage = (neg / total) * 100
-
-    labels = ['Positive {:.2f}%'.format(pos_percentage), 'Neutral {:.2f}%'.format(
-        neu_percentage), 'Negative {:.2f}%'.format(neg_percentage)]
+    labels = []
     sizes = review_by_sentiment['total']
-    colours = {'Positive {:.2f}%'.format(pos_percentage): '#1B290D',
-               'Neutral {:.2f}%'.format(neu_percentage): '#8b6636',
-               'Negative {:.2f}%'.format(neg_percentage): '#6d0000'}
+    colours = {}
+
+    if "Positive" in sentiment:
+        pos_index = review_by_sentiment[review_by_sentiment['sentiment']
+                                        == 'Positive']['total'].index.values[0]
+        pos = review_by_sentiment['total'][pos_index]
+        pos_percentage = (pos / total) * 100
+        labels.append('Positive {:.2f}%'.format(pos_percentage))
+        colours['Positive {:.2f}%'.format(pos_percentage)] = '#1B290D'
+
+    if "Neutral" in sentiment:
+        neu_index = review_by_sentiment[review_by_sentiment['sentiment']
+                                        == 'Neutral']['total'].index.values[0]
+        neu = review_by_sentiment['total'][neu_index]
+        neu_percentage = (neu / total) * 100
+        labels.append('Neutral {:.2f}%'.format(neu_percentage))
+        colours['Neutral {:.2f}%'.format(neu_percentage)] = '#8b6636'
+
+    if "Negative" in sentiment:
+        neg_index = review_by_sentiment[review_by_sentiment['sentiment']
+                                        == 'Negative']['total'].index.values[0]
+        neg = review_by_sentiment['total'][neg_index]
+        neg_percentage = (neg / total) * 100
+        labels.append('Negative {:.2f}%'.format(neg_percentage))
+        colours['Negative {:.2f}%'.format(neg_percentage)] = '#6d0000'
 
     obj = plt.figure(figsize=(3.95, 3.75), dpi=100)
 
@@ -311,7 +330,6 @@ def plot_totalreview_sentiment(data, temp_dir):
     obj = plt.tight_layout()
     obj = plt.savefig(
         f'sentiport/artifacts/{temp_dir}/fig_totalreview_sentiment.png', bbox_inches='tight')
-
     idmax = review_by_sentiment['total'].idxmax()
     max_sentiment = review_by_sentiment['sentiment'][idmax]
     max_value = review_by_sentiment['total'][idmax]
@@ -320,33 +338,33 @@ def plot_totalreview_sentiment(data, temp_dir):
 
 
 def plot_sentiment_time(data, temp_dir):
-    sentiment_summary = pd.DataFrame(
-        data['sentiment'].groupby(data['at']).value_counts())
-    sentiment_summary.rename(columns={'sentiment': 'total'}, inplace=True)
-    sentiment_summary = sentiment_summary.reset_index()
+    if "week_time" in data.columns:
+        sentiment_summary = pd.DataFrame(
+            data['sentiment'].groupby(data['week_time']).value_counts())  # at
+        sentiment_summary.rename(columns={'sentiment': 'total'}, inplace=True)
+        sentiment_summary = sentiment_summary.reset_index()
 
-    pivot = pd.pivot_table(sentiment_summary, index='at',
-                           columns='sentiment', values='total')
-    pivot = pivot.reset_index()
-    pivot = pivot.rename(columns={'sentiment': 'no'})
+        pivot = pd.pivot_table(
+            sentiment_summary, index='week_time', columns='sentiment', values='total')  # at
+        pivot = pivot.reset_index()
+        pivot = pivot.rename(columns={'sentiment': 'no'})
 
-    pivot['time'] = pivot['at'].dt.strftime("%b %Y")
+        pivot['time'] = pivot['week_time']
+    else:
+        sentiment_summary = pd.DataFrame(
+            data['sentiment'].groupby(data['at']).value_counts())  # at
+        sentiment_summary.rename(columns={'sentiment': 'total'}, inplace=True)
+        sentiment_summary = sentiment_summary.reset_index()
 
-    idmax_pos = pivot['Positive'].idxmax()
-    idmin_pos = pivot['Positive'].idxmin()
+        pivot = pd.pivot_table(sentiment_summary, index='at',
+                               columns='sentiment', values='total')  # at
+        pivot = pivot.reset_index()
+        pivot = pivot.rename(columns={'sentiment': 'no'})
+        pivot['time'] = pivot['at'].dt.strftime("%b %Y")  # at
 
-    pos_max_value = pivot['Positive'][idmax_pos]
-    pos_min_value = pivot['Positive'][idmin_pos]
-    pos_max_time = pivot['time'][idmax_pos]
-    pos_min_time = pivot['time'][idmin_pos]
-
-    idmax_neg = pivot['Negative'].idxmax()
-    idmin_neg = pivot['Negative'].idxmin()
-
-    neg_max_value = pivot['Negative'][idmax_neg]
-    neg_min_value = pivot['Negative'][idmin_neg]
-    neg_max_time = pivot['time'][idmax_neg]
-    neg_min_time = pivot['time'][idmin_neg]
+        # sentiment = []
+    # for i in pivot['sentiment']:
+    #   sentiment.append(i)
 
     labels = pivot['time']
 
@@ -356,9 +374,39 @@ def plot_sentiment_time(data, temp_dir):
 
     obj = plt.figure()
     fig, ax = plt.subplots(figsize=(8.7084, 2.7394), dpi=100)
-    obj = ax.bar(x - width, neg, width, label='Negative', color='#6d0000')
-    obj = ax.bar(x, neu, width, label='Neutral', color='#8b6636')
-    obj = ax.bar(x + width, pos, width, label='Positive', color='#1B290D')
+
+    if "Negative" in pivot.columns:
+        idmax_neg = pivot['Negative'].idxmax()
+        idmin_neg = pivot['Negative'].idxmin()
+
+        neg_max_value = pivot['Negative'][idmax_neg]
+        neg_min_value = pivot['Negative'][idmin_neg]
+        neg_max_time = pivot['time'][idmax_neg]
+        neg_min_time = pivot['time'][idmin_neg]
+        neg = pivot['Negative']
+        obj = ax.bar(x - width, neg, width, label='Negative', color='#6d0000')
+
+    if "Neutral" in pivot.columns:
+        idmax_neu = pivot['Neutral'].idxmax()
+        idmin_neu = pivot['Neutral'].idxmin()
+
+        nue_max_value = pivot['Neutral'][idmax_neu]
+        neu_min_value = pivot['Neutral'][idmin_neu]
+        neu_max_time = pivot['time'][idmax_neu]
+        neu_min_time = pivot['time'][idmin_neu]
+        neu = pivot['Neutral']
+        obj = ax.bar(x, neu, width, label='Neutral', color='#8b6636')
+
+    if "Positive" in pivot.columns:
+        idmax_pos = pivot['Positive'].idxmax()
+        idmin_pos = pivot['Positive'].idxmin()
+
+        pos_max_value = pivot['Positive'][idmax_pos]
+        pos_min_value = pivot['Positive'][idmin_pos]
+        pos_max_time = pivot['time'][idmax_pos]
+        pos_min_time = pivot['time'][idmin_pos]
+        pos = pivot['Positive']
+        obj = ax.bar(x + width, pos, width, label='Positive', color='#1B290D')
 
     obj = ax.set_title('Review Sentiment Across Time', fontproperties=fontprop)
     # obj = ax.legend()
@@ -395,6 +443,11 @@ def plot_sentiment_version(data, temp_dir):
                            columns='sentiment', values='total')
     pivot = pivot.reset_index()
     pivot = pivot.rename(columns={'sentiment': 'no'})
+
+    version = pivot['version'].nunique()
+    if version > 20:
+        pivot = pivot[:20]
+
     idmax_pos = pivot['Positive'].idxmax()
     idmin_pos = pivot['Positive'].idxmin()
 
@@ -428,7 +481,7 @@ def plot_sentiment_version(data, temp_dir):
 
     obj = ax.set_title('Review Sentiment Across Version',
                        fontproperties=fontprop)
-    obj = ax.legend()
+    #obj = ax.legend()
     obj = plt.xticks(x_vals, pivot['version'], rotation=90, fontsize=7)
     obj = plt.ylabel("Number of Review", fontproperties=fontprop_label)
     obj = plt.box(False)
