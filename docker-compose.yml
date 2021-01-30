@@ -3,6 +3,7 @@ version: '3.8'
 services:
     web:
         image: sentiport-heroku_web:topic-extraction-packed
+        container_name: gunicorn-test
         build: .
         command: gunicorn --bind :8000 sentiport:app # DEBUG
         volumes:
@@ -12,3 +13,11 @@ services:
           - .env 
         ports:
           - 8000:8000
+          - 5000:5000 
+          - 5050:5050 
+          - 5555:5555 
+          - 5500:5500 
+          - 5005:5005
+    
+    redis:
+      image: "redis:alpine"

@@ -36,7 +36,7 @@ def plot_overall_rating(dataframe, temp_dir):
     '''
     # Overal Rating Chart
     # Preprocessing
-    df = dataframe
+    df = dataframe.copy()
     grouped_multiple = df.groupby(['rating']).agg({'review': ['count']})
     grouped_multiple.columns = ['review']
     grouped_multiple = grouped_multiple.reset_index()

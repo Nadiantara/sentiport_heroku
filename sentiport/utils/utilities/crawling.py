@@ -1,11 +1,6 @@
 # prepare the environment
-import numpy as np
 import pandas as pd
-import regex
-import string
-import time
-from distutils.version import LooseVersion, StrictVersion
-from google_play_scraper import app, reviews, reviews_all, Sort
+from google_play_scraper import app, reviews
 from tqdm import tqdm
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
@@ -60,32 +55,6 @@ def get_crawl_google(id, country_id):
 
     df_google.reset_index(drop=True, inplace=True)
     df_google['at'] = pd.to_datetime(df_google['at'])
-    return df_google
-
-    # creating the dataframe
-    data = [dfp['reviewId'], dfp['content'],
-            dfp['reviewCreatedVersion'], dfp['score'], dfp['at']]
-    headers = ['reviewId', 'review', 'version', 'rating', 'at']
-    df_google = pd.concat(data, axis=1, keys=headers)
-    df_google['version'].fillna("null", inplace=True)
-
-    # fill the null value on the version
-    for idx in range(len(df_google)-1):
-        if df_google['version'][idx] == 'null':
-            df_google.loc[idx, 'version'] = df_google['version'][idx+1]
-
-    # drop version which lead to error (ex: '334280')
-    for i in range(len(df_google)):
-        if "." in df_google['version'][i][1]:
-            pass
-        elif "." in df_google['version'][i][2]:
-            pass
-        else:
-            df_google.drop(index=i, inplace=True)
-    df_google.reset_index(drop=True, inplace=True)
-    # set the 'at' column as datetime
-    df_google['at'] = pd.to_datetime(df_google['at'])
-
     return df_google
 
 

@@ -7,16 +7,14 @@ from email import encoders
 from os import environ, mkdir
 from shutil import rmtree
 from threading import Thread
-import json
 from flask.helpers import make_response
-import redis
 # importing unit 4's functions
 from sentiport.utils.utilities.crawling import *
 from sentiport.pdf_generator import create_pdf
 from sentiport.mail import create_email_message, get_user_mail
 from sentiport.forms import AppForm
-from sentiport import app, thread_lock, threads, store
-from flask import render_template, url_for, flash, redirect, request, abort, session, jsonify
+from sentiport import app, thread_lock, store
+from flask import render_template, url_for, flash, redirect, request, abort, jsonify
 from uuid import uuid1
 
 
@@ -47,9 +45,11 @@ def status(thread_id):
             "is_error",
             "error_message",
             "runtime_message"
-            )
-        is_running, is_error, error_message, runtime_message = [status.decode("utf-8") for status in statuses]
-        is_running = int(is_running); is_error = int(is_error)
+        )
+        is_running, is_error, error_message, runtime_message = [
+            status.decode("utf-8") for status in statuses]
+        is_running = int(is_running)
+        is_error = int(is_error)
         return jsonify({
             "status": 200,
             "thread_id": thread_id,
@@ -64,7 +64,7 @@ def status(thread_id):
         return {
             "status": 500,
             "error": str(e)
-        }        
+        }
 
 
 @app.route("/status/delete", methods=['POST'])
@@ -86,22 +86,22 @@ def scrape():
         rule = request.url_rule
         is_iframe = "iframe" in rule.rule
         form = None
-        
+
         if is_iframe:
             APP_URL = request.form['app_id']
             COUNTRY = request.form['country_code']
             targetmail = request.form['email']
             # DEBUG
             print(request.form)
-            is_form_valid = True # Bypass rule
+            is_form_valid = True  # Bypass rule
         else:
             form = AppForm()
             APP_URL = form.app_id.data
             COUNTRY = request.form['country_code']
             targetmail = form.email.data
             is_form_valid = form.validate_on_submit()
-        
-        if is_form_valid:            
+
+        if is_form_valid:
             try:
                 url_res = requests.get(APP_URL)
                 PLAYSTORE_ID = get_id(APP_URL)
@@ -122,7 +122,7 @@ def scrape():
                     )
                 )
                 thread.start()
-                
+
                 # store status to redis
                 if not is_iframe:
                     store.hmset(thread_id, {
@@ -134,7 +134,7 @@ def scrape():
 
                 if is_iframe:
                     return redirect(url_for('index'))
-                
+
                 status_url = url_for("status", thread_id=thread_id)
                 return make_response(render_template(
                     'status.html',
@@ -145,7 +145,6 @@ def scrape():
                     user_email=targetmail,
                     form=form
                 ))
-                
 
             flash("""Wrong url or the application doesnt exist""", 'danger')
             return redirect(url_for('index'))
@@ -164,7 +163,7 @@ def get_id(toParse):
 
 def pipeline(playstore_id, country, targetmail, thread_id, is_iframe):
     temp_path = f'sentiport/artifacts/{thread_id}'
-    mkdir(temp_path) 
+    mkdir(temp_path)
     try:
         """PREPARING PLOTS AND VALUE"""
         # store status to redis
@@ -232,7 +231,7 @@ def pipeline(playstore_id, country, targetmail, thread_id, is_iframe):
         encoders.encode_base64(p)
 
         p.add_header('Content-Disposition',
-                        "attachment; filename= %s" % filename)
+                     "attachment; filename= %s" % filename)
 
         msg.attach(p)
 

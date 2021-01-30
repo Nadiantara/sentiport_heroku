@@ -26,6 +26,12 @@ pyspark==2.4.7
 pylab-sdk
 ipywidgets
 jupyter
+cycler==0.10.0
+gensim==3.8.3
+notebook==6.1.4
+semver==2.10.2
+statsmodels==0.11.1
+wordcloud==1.8.0
 # production libraries
 Flask
 flask_mail

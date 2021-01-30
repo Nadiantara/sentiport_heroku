@@ -1,6 +1,17 @@
 # **sentiport**
 Super-minimalistic app version of the Data Analysts' sentiment analysis automated reporting. This web app scrape data from google play store and then send you the analysis as a pdf file to your email. 
 
+## **Release Notes**
+30-01-2021 Release:
+- Latest Branch: dev-ardy-topic-extraction (integrated to main)
+- Additions:
+  - Added topic modelling functionality with JohnSnowLabs NLU
+  - Added Dockerfile and Docker-Compose file
+  - Some refactoring
+- Notes:
+  - Bad practices still exist
+  - Not optimized yet. (Time and space complexity)
+
 ## **Prerequisites**
 Before starting to contribute, make sure you are familiar with these tools:
   - Python
@@ -131,9 +142,9 @@ Root
     - `SECRET_KEY=aDAKSKCMAlzakl321s` #up to you, like password for personal debuging
     - `ST_EMAIL=<your email>` #contact us if you want to use supertype email and password
     - `ST_PASSWORD=<your email's password>` 
-    - `REDISCLOUD_URL=<redis cloud url>` #optional if you want to deploy it to heroku or to run localy without docker, use the url that already given 
+    - `REDISCLOUD_URL=<redis cloud url>` #[optional] if you want to deploy it to heroku or to run localy without docker, use the url that already given 
   
-#### **1. With Docker**
+#### **1. With Docker [RECOMMENDED]**
 - Install Docker 
   - For Windows without WSL/WSL2:
     - [For Windows Home](https://docs.docker.com/docker-for-windows/install-windows-home/)
@@ -145,16 +156,15 @@ Root
     - [Install Docker](https://docs.docker.com/engine/install/)
     - [Install Docker Compose](https://docs.docker.com/compose/install/)
   - [For Mac](https://docs.docker.com/docker-for-mac/install/)
-- Go to sentiport folder, open `__init.py__`
-- Make sure the redis configuration is this: `store = redis.Redis(host="redis", port=6379)` and delete the configuration that using `REDISCLOUD_URL` 
-- Build docker images and run the services
-> ```
->     > docker-compose build (This will take some time)
->     > docker-compose up
-> ```
-
   
-#### **2. Without Docker**
+- Make sure you're in the root folder of this repository
+- Build docker images and run the services with these commands:
+> ```
+>     $ docker build -t sentiport-heroku_web:topic-extraction-packed --file dev.Dockerfile .
+>     $ docker-compose up
+> ```
+  
+#### **2. Without Docker [NOT YET UPDATED]**
 - For Windows without WSL:
   - Create virtual environment
   - Install all requirements with: `pip install -r requirements.txt`
